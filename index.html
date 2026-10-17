@@ -91,12 +91,22 @@ header #fileMenu button:active{background:#e8eff9}
 .pi b{font-size:13px;font-weight:600}
 .pi span{font-size:10.5px;color:var(--sub)}
 #bSide,#bSideR{display:none}
+.edgeTab{position:absolute;top:42%;z-index:5;align-items:center;justify-content:center;padding:16px 8px;line-height:1.2;min-height:0;font-size:13px;font-weight:700;opacity:.92;box-shadow:0 2px 8px rgba(15,23,42,.25)}
+#bSide{left:0;border-radius:0 12px 12px 0;background:#f4d9a6;border-color:#d9b36a;color:#7a4b00}
+#bSideR{right:0;border-radius:12px 0 0 12px;background:#bfe2c4;border-color:#85bb8c;color:#1f5a2a}
+#bSide[hidden],#bSideR[hidden]{display:none!important}
+body.drawer #bSide,body.drawer #bSideR{display:none!important}
 @media (max-width:760px){
   .side{position:absolute;top:0;bottom:0;z-index:6;transition:transform .2s}
   #sideL{left:0;box-shadow:6px 0 18px rgba(15,23,42,.18);transform:translateX(-100%)}
   #sideR{right:0;box-shadow:-6px 0 18px rgba(15,23,42,.18);transform:translateX(100%)}
-  .side.open{transform:none}
-  #bSide,#bSideR{display:inline-flex}
+  #sideL.open,#sideR.open{transform:none}
+  .side{width:min(262px,80vw)}
+  #bSide,#bSideR{display:flex;text-align:center}
+  header{padding:6px 8px;gap:6px}
+  header #title{width:104px}
+  header .grp label{font-size:12px}
+  header button,header select{min-height:34px}
 }
 .overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;z-index:50}
 .dlg{background:#fff;border-radius:14px;padding:20px 22px;width:min(420px,92vw)}
@@ -135,8 +145,6 @@ header #fileMenu button:active{background:#e8eff9}
       <label title="色を外して、白黒・グレー印刷したときの見え方を確認します"><input type="checkbox" id="chkMono">白黒で確認</label>
     </div>
     <div class="grow"></div>
-    <button id="bSide" class="ghost">屋内パネル</button>
-    <button id="bSideR" class="ghost">屋外パネル</button>
     <div id="fileWrap">
       <button id="bFile" class="primary" aria-haspopup="true">ファイル ▾</button>
       <div id="fileMenu" hidden>
@@ -197,7 +205,6 @@ header #fileMenu button:active{background:#e8eff9}
     <div class="grp" id="gSel">
       <button id="bDel">削除</button>
       <button id="bDup">複製</button>
-      <button id="bLen">壁の長さを数字で変更</button>
       <button id="bRm">撤去にする</button>
     </div>
     <div class="grp" id="gReform">
@@ -274,6 +281,8 @@ header #fileMenu button:active{background:#e8eff9}
     <div id="stage">
       <canvas id="cv"></canvas>
       <div id="badge"></div>
+      <button id="bSide" class="edgeTab" aria-label="屋内パネルを開く">屋内<br>▶</button>
+      <button id="bSideR" class="edgeTab" aria-label="屋外パネルを開く">屋外<br>◀</button>
       <div id="hint"></div>
       <div id="toast"></div>
     </div>
@@ -1237,7 +1246,7 @@ function panel(ctx,w,h,kind,o){
     for(const it of items)if(it.e.layer===sw.layer&&sw.ids.has(it.e.w.id))line(it.e.A,it.e.B);
     if(single){
       ctx.fillStyle='#e8590c';
-      for(const it of items)if(it.e.layer===sw.layer&&sw.ids.has(it.e.w.id)){for(const n of[it.e.A,it.e.B]){const p=P(n);ctx.beginPath();ctx.arc(p[0],p[1],6,0,7);ctx.fill();}}
+      for(const it of items)if(it.e.layer===sw.layer&&sw.ids.has(it.e.w.id)){for(const n of[it.e.A,it.e.B]){const p=P(n);ctx.beginPath();ctx.arc(p[0],p[1],9,0,7);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.stroke();}}
     }
   }
   // 壁
@@ -1415,6 +1424,14 @@ function hitHandle(p){
     if(n.k==='call'&&near({x:n.tx,y:n.ty}))return{kind:'handle',which:'nt'};
     return null;
   }
+  if(s&&s.type==='wall'&&s.layer===editLayer()){
+    const L=D[s.layer],nm=nodeMap(L),wid=[...s.ids][0],w=L.walls.find(x=>x.id===wid);
+    if(!w)return null;
+    const A=nm.get(w.a),B=nm.get(w.b);
+    if(!A||!B||!oriOf(A,B))return null;
+    for(const n of[A,B])if(Math.hypot(p.x-(n.x*view.s+view.ox),p.y-(n.y*view.s+view.oy))<=18)return{kind:'handle',which:'wend',wid,nid:n.id};
+    return null;
+  }
   if(!s||s.type!=='furn')return null;
   const f=furnById(s.id);if(!f||!furnHandleOk(f)||(DEF[f.t]&&DEF[f.t].vrail))return null;
   const hp=handlePos(f);
@@ -1547,6 +1564,20 @@ function beginDrag(){
     if(fl&&fl.layer===editLayer()){g.pre=JSON.stringify(D);g.kind='flmove';g.fl=fl;g.o=fl.pts.map(q=>({x:q.x,y:q.y}));ui.dragging=true;return;}
     g.kind='pan';g.o0={ox:view.ox,oy:view.oy};return;
   }
+  if(h&&h.kind==='handle'&&h.which==='wend'){
+    const L=D[ui.sel.layer],nm=nodeMap(L),inc=incMap(L);
+    const w=L.walls.find(x=>x.id===h.wid),A=nm.get(w.a),B=nm.get(w.b),o=oriOf(A,B);
+    const ax=o==='H'?'x':'y',tgt=nm.get(h.nid),oth=tgt===A?B:A;
+    const nodes=new Set([tgt.id]);
+    for(const x of inc.get(tgt.id)){
+      if(x.id===h.wid)continue;
+      const xo=oriOf(nm.get(x.a),nm.get(x.b));
+      if(xo&&xo!==o)for(const id of chainOf(L,x.id).nodes)nodes.add(id);
+    }
+    g.pre=JSON.stringify(D);g.kind='wend';g.L=L;g.layer=ui.sel.layer;g.ax=ax;g.c0=tgt[ax];g.oth=oth[ax];
+    g.nodeIds=nodes;g.orig=new Map();for(const id of nodes){const n=nm.get(id);g.orig.set(id,{x:n.x,y:n.y});}
+    g.wa=w.a;g.wb=w.b;g.delta={x:0,y:0};ui.dragging=true;return;
+  }
   if(h&&h.kind==='handle'){
     g.pre=JSON.stringify(D);
     const f=editableFurn();
@@ -1605,6 +1636,15 @@ function applyDrag(p){
     draw();return;
   }
   const nm=nodeMap(g.L);
+  if(g.kind==='wend'){
+    const d=g.ax==='y'?dy:dx;
+    let c=snapCoord(g.ax,g.c0+d,g.nodeIds);
+    if(g.c0>=g.oth)c=Math.max(c,g.oth+100);else c=Math.min(c,g.oth-100);
+    const dd=c-g.c0;
+    for(const[id,o]of g.orig){const n=nm.get(id);n[g.ax]=o[g.ax]+dd;}
+    g.delta=g.ax==='y'?{x:0,y:dd}:{x:dd,y:0};
+    draw();return;
+  }
   if(g.kind==='fig'){
     const st=ui.step>0?ui.step:1,ddx=Math.round(dx/st)*st,ddy=Math.round(dy/st)*st;
     for(const[id,o]of g.orig){const n=nm.get(id);n.x=o.x+ddx;n.y=o.y+ddy;}
@@ -1619,7 +1659,7 @@ function applyDrag(p){
 function cancelDrag(gg){
   ui.dragging=false;
   if(gg.kind==='fmove'||gg.kind==='frot'||gg.kind==='fsize'||gg.kind==='flmove'||gg.kind==='flv'||gg.kind==='nmove'||gg.kind==='nh'){D=fixData(JSON.parse(gg.pre));ui.sel=null;afterChange();return;}
-  if(gg.kind==='fig'||gg.kind==='chain'){const nm=nodeMap(gg.L);for(const[id,o]of gg.orig){const n=nm.get(id);n.x=o.x;n.y=o.y;}}
+  if(gg.kind==='fig'||gg.kind==='chain'||gg.kind==='wend'){const nm=nodeMap(gg.L);for(const[id,o]of gg.orig){const n=nm.get(id);n.x=o.x;n.y=o.y;}}
   draw();
 }
 function finishDrag(gg){
@@ -1856,33 +1896,6 @@ function dupSel(){
   ui.sel=wid!=null?{layer:s.layer,type:'figure',ids:component(L,wid)}:null;
   commit(pre);toast('複製しました（右下にずらして配置）。そのまま壁をドラッグして位置を調整できます');
 }
-function editLength(){
-  const s=ui.sel;if(!s||s.type!=='wall'||s.layer!==editLayer())return;
-  const L=D[s.layer],nm=nodeMap(L),wid=[...s.ids][0],w=L.walls.find(x=>x.id===wid);
-  const A=nm.get(w.a),B=nm.get(w.b),o=oriOf(A,B);if(!o){toast('斜めの壁の長さは、数字では変更できません。描き直してください');return;}
-  const len=Math.round(Math.hypot(B.x-A.x,B.y-A.y));
-  const v=prompt('この壁の長さ（mm）を入力してください',String(len));if(v===null)return;
-  const nv=Math.round(parseFloat(String(v).replace(/[,，\s]/g,'')));
-  if(!(nv>=100)){toast('100mm以上の数字を入力してください');return;}
-  const delta=nv-len;if(!delta)return;
-  const ax=o==='H'?'x':'y';
-  const hiN=A[ax]>B[ax]?A:B,loN=hiN===A?B:A;
-  const inc=incMap(L);
-  const hasCollinear=n=>inc.get(n.id).some(x=>x.id!==wid&&oriOf(nm.get(x.a),nm.get(x.b))===o);
-  let tgt,dd;
-  if(!hasCollinear(hiN)){tgt=hiN;dd=delta;}
-  else if(!hasCollinear(loN)){tgt=loN;dd=-delta;}
-  else{toast('この壁は両端とも線が続いているため、数字では変更できません');return;}
-  const pre=JSON.stringify(D);
-  const perp=inc.get(tgt.id).find(x=>x.id!==wid&&oriOf(nm.get(x.a),nm.get(x.b))&&oriOf(nm.get(x.a),nm.get(x.b))!==o);
-  if(perp){const ch=chainOf(L,perp.id);for(const id of ch.nodes)nm.get(id)[ax]+=dd;}
-  else tgt[ax]+=dd;
-  const A2=nm.get(w.a),B2=nm.get(w.b),mid={x:(A2.x+B2.x)/2,y:(A2.y+B2.y)/2};
-  normalize(L);
-  const nw=wallAtPoint(L,mid);
-  ui.sel=nw!=null?{layer:s.layer,type:'wall',ids:new Set([nw])}:null;
-  commit(pre);
-}
 function toggleRm(){
   const s=ui.sel;if(!s||ui.mode!=='reform'||ui.editBase)return;
   const pre=JSON.stringify(D);
@@ -2118,7 +2131,6 @@ function updateUI(){
   $('#bUndo').disabled=!undoStack.length;$('#bRedo').disabled=!redoStack.length;
   $('#bDel').disabled=!((sw&&sw.layer===el)||(sf&&sf.layer===el)||(sfl&&sfl.layer===el)||(snt&&snt.layer===el));
   $('#bDup').disabled=!((sw&&sw.type==='figure'&&sw.layer===el)||(sf&&el)||(sfl&&el)||(snt&&el));
-  $('#bLen').disabled=!(sw&&sw.type==='wall'&&sw.layer===el);
   const rmOk=ui.mode==='reform'&&!ui.editBase;
   $('#bRm').hidden=!rmOk;
   const baseSel=(sw&&sw.layer==='base')||(sf&&sf.layer==='base')||(sfl&&sfl.layer==='base');
@@ -2148,7 +2160,7 @@ function updateUI(){
   else if(s.type==='room')h='部屋を選択中：右の「この部屋は」で役割を決めると、役割に合う家具を自動で置けます。';
   else if(s.type==='furn')h='家具を選択中：ドラッグで移動、○で回転、四隅の□で大きさ変更（反対側の角は固定）。赤い枠は壁との重なりです。右のボタンで「空きスペースへ移動」もできます。';
   else if(s.type==='figure')h='図形を選択中：「削除」「複製」ができます。選択中の壁をドラッグすると図形ごと動きます。もう一度壁をタップするとその線だけを選択。';
-  else h='線を選択中：ドラッグで平行移動、「壁の長さを数字で変更」で寸法を入力。もう一度同じ線をタップすると図形全体の選択に戻ります。';
+  else h='線を選択中：ドラッグで平行移動、両端の○をドラッグで長さを変えられます。もう一度同じ線をタップすると図形全体の選択に戻ります。';
   if(ui.mode==='reform'&&ui.tool==='select'&&!ui.editBase&&((sw&&sw.layer==='base')))h='現状の壁を選択中：「撤去にする」で赤い点線（取り壊し）にできます。';
   if(ui.mode==='reform'&&sf&&sf.layer==='base')h='現状の家具です。動かしたり回したりすると、改修後の位置が青で作られ、元の位置は赤い点線になります。';
   const _hk=ui.mode+'|'+ui.tool+'|'+(ui.placing?1:0)+'|'+(ui.noteTool||'')+'|'+(ui.diag?1:0);
@@ -2340,7 +2352,7 @@ $('#bPlaceAuto').onclick=()=>{const k=ui.placing;if(k)addFurn(k);};
 $('#bPlaceRot').onclick=()=>{ui.placeRot=!ui.placeRot;draw();};
 $('#bDiag').onclick=()=>{ui.diag=!ui.diag;updateUI();toast(ui.diag?'斜めの壁：ON。始点から終点まで、まっすぐなぞると斜めの壁になります（壁の角には吸い付きます）':'斜めの壁：OFF。なぞった線は、横・縦のまっすぐな壁に直ります');};
 $('#bClear').onclick=clearAll;$('#bDelGuide').onclick=delGuide;
-$('#bDel').onclick=delSel;$('#bDup').onclick=dupSel;$('#bLen').onclick=editLength;$('#bRm').onclick=toggleRm;
+$('#bDel').onclick=delSel;$('#bDup').onclick=dupSel;$('#bRm').onclick=toggleRm;
 $('#bFit').onclick=()=>{ui.autoFit=true;fit();draw();};
 $('#bFlip').onclick=()=>{ui.toggleAfter=!ui.toggleAfter;updateUI();draw();};
 $('#bBack').onclick=()=>setMode('reform');
@@ -2363,8 +2375,17 @@ function flipDoor(key){const pre=JSON.stringify(D),f=editableFurn();if(!f)return
 $('#bDoorFs').onclick=()=>flipDoor('fs');$('#bDoorHs').onclick=()=>flipDoor('hs');
 $('#bRot90').onclick=()=>rotBy(90);$('#bRotM').onclick=()=>rotBy(-15);$('#bRotP').onclick=()=>rotBy(15);
 $('#bFree').onclick=moveFree;$('#bFDup').onclick=dupFurn;$('#bFNote').onclick=editNote;$('#bFRm').onclick=delOrRmFurn;
-$('#bSide').onclick=()=>{$('#sideR').classList.remove('open');$('#sideL').classList.toggle('open');};
-$('#bSideR').onclick=()=>{$('#sideL').classList.remove('open');$('#sideR').classList.toggle('open');};
+function setDrawer(which){
+  $('#sideL').classList.toggle('open',which==='L');$('#sideR').classList.toggle('open',which==='R');
+  document.body.classList.toggle('drawer',!!which);
+}
+$('#bSide').onclick=()=>setDrawer('L');
+$('#bSideR').onclick=()=>setDrawer('R');
+cv.addEventListener('pointerdown',()=>{if(document.body.classList.contains('drawer'))setDrawer(null);},true);
+for(const id of['#sideL','#sideR'])$(id).addEventListener('click',e=>{
+  if(!e.target.closest('button'))return;
+  setTimeout(()=>{if(ui.placing)setDrawer(null);},0);
+});
 $('#title').oninput=e=>{D.title=e.target.value;save();};
 (function(){
   const fm=$('#fileMenu'),fb=$('#bFile');
