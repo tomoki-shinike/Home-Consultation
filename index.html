@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>間取りシミュレーター</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -11,14 +11,14 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="間取り">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 :root{--bg:#f3f5f8;--panel:#fff;--line:#d9dee6;--text:#1f2933;--sub:#667085;--blue:#1a6cf0;--blue-weak:#e8f0fe;--warn:#e8590c}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #app{display:flex;flex-direction:column;height:100vh;height:100dvh}
-header{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#1d232e;border-bottom:1px solid #0e1219;flex-wrap:wrap}
+header{display:flex;align-items:center;gap:10px;padding:8px max(12px,env(safe-area-inset-right)) 8px max(12px,env(safe-area-inset-left));padding-top:calc(8px + env(safe-area-inset-top));background:#1d232e;border-bottom:1px solid #0e1219;flex-wrap:wrap}
 header .grow{flex:1}
 #title{font:inherit;font-size:15px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;min-width:220px;-webkit-user-select:text;user-select:text}
 body.mono #cv{filter:grayscale(1)}
@@ -91,18 +91,19 @@ header #fileMenu button:active{background:#e8eff9}
 .pi b{font-size:13px;font-weight:600}
 .pi span{font-size:10.5px;color:var(--sub)}
 #bSide,#bSideR{display:none}
+body.fold #toolbar,body.fold #gView{display:none}
 .edgeTab{position:absolute;top:42%;z-index:5;align-items:center;justify-content:center;padding:16px 8px;line-height:1.2;min-height:0;font-size:13px;font-weight:700;opacity:.92;box-shadow:0 2px 8px rgba(15,23,42,.25)}
 #bSide{left:0;border-radius:0 12px 12px 0;background:#f4d9a6;border-color:#d9b36a;color:#7a4b00}
 #bSideR{right:0;border-radius:12px 0 0 12px;background:#bfe2c4;border-color:#85bb8c;color:#1f5a2a}
 #bSide[hidden],#bSideR[hidden]{display:none!important}
 body.drawer #bSide,body.drawer #bSideR{display:none!important}
+body.drawers .side{position:absolute;top:0;bottom:0;z-index:6;transition:transform .2s;width:min(262px,80vw)}
+body.drawers #sideL{left:0;transform:translateX(-100%)}
+body.drawers #sideR{right:0;transform:translateX(100%)}
+body.drawers #sideL.open{transform:none;box-shadow:6px 0 18px rgba(15,23,42,.18)}
+body.drawers #sideR.open{transform:none;box-shadow:-6px 0 18px rgba(15,23,42,.18)}
+body.drawers #bSide,body.drawers #bSideR{display:flex;text-align:center}
 @media (max-width:760px){
-  .side{position:absolute;top:0;bottom:0;z-index:6;transition:transform .2s}
-  #sideL{left:0;box-shadow:6px 0 18px rgba(15,23,42,.18);transform:translateX(-100%)}
-  #sideR{right:0;box-shadow:-6px 0 18px rgba(15,23,42,.18);transform:translateX(100%)}
-  #sideL.open,#sideR.open{transform:none}
-  .side{width:min(262px,80vw)}
-  #bSide,#bSideR{display:flex;text-align:center}
   header{padding:6px 8px;gap:6px}
   header #title{width:104px}
   header .grp label{font-size:12px}
@@ -145,6 +146,7 @@ body.drawer #bSide,body.drawer #bSideR{display:none!important}
       <label title="色を外して、白黒・グレー印刷したときの見え方を確認します"><input type="checkbox" id="chkMono">白黒で確認</label>
     </div>
     <div class="grow"></div>
+    <button id="bFold" class="ghost" aria-label="メニューの折りたたみ">▲ 折りたたむ</button>
     <div id="fileWrap">
       <button id="bFile" class="primary" aria-haspopup="true">ファイル ▾</button>
       <div id="fileMenu" hidden>
@@ -152,6 +154,7 @@ body.drawer #bSide,body.drawer #bSideR{display:none!important}
         <button id="bSave">保存（ファイルに書き出す）</button>
         <button id="bLoad">読込（ファイルを開く）</button>
         <button id="bPrint">印刷・画像保存</button>
+        <button id="bPanelMode"></button>
       </div>
     </div>
   </header>
@@ -2375,6 +2378,24 @@ function flipDoor(key){const pre=JSON.stringify(D),f=editableFurn();if(!f)return
 $('#bDoorFs').onclick=()=>flipDoor('fs');$('#bDoorHs').onclick=()=>flipDoor('hs');
 $('#bRot90').onclick=()=>rotBy(90);$('#bRotM').onclick=()=>rotBy(-15);$('#bRotP').onclick=()=>rotBy(15);
 $('#bFree').onclick=moveFree;$('#bFDup').onclick=dupFurn;$('#bFNote').onclick=editNote;$('#bFRm').onclick=delOrRmFurn;
+function lsGet(k){try{return localStorage.getItem(k);}catch(_){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(_){}}
+function panelsAsDrawers(){const m=lsGet('madori-panel');return m==='drawer'?true:m==='always'?false:innerWidth<=1200;}
+function applyPanelMode(){
+  const on=panelsAsDrawers();
+  document.body.classList.toggle('drawers',on);
+  if(!on){document.body.classList.remove('drawer');$('#sideL').classList.remove('open');$('#sideR').classList.remove('open');}
+  $('#bPanelMode').textContent=on?'左右パネル：必要なときだけ開く':'左右パネル：常に表示する';
+}
+$('#bPanelMode').onclick=()=>{lsSet('madori-panel',panelsAsDrawers()?'always':'drawer');applyPanelMode();};
+window.addEventListener('resize',applyPanelMode);
+function applyFold(){
+  const f=lsGet('madori-fold')==='1';
+  document.body.classList.toggle('fold',f);
+  $('#bFold').textContent=f?'▼ メニュー':'▲ 折りたたむ';
+}
+$('#bFold').onclick=()=>{lsSet('madori-fold',lsGet('madori-fold')==='1'?'0':'1');applyFold();};
+applyPanelMode();applyFold();
 function setDrawer(which){
   $('#sideL').classList.toggle('open',which==='L');$('#sideR').classList.toggle('open',which==='R');
   document.body.classList.toggle('drawer',!!which);
