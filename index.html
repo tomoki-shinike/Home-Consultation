@@ -55,6 +55,12 @@ select,input[type=number]{font:inherit;font-size:13px;padding:5px 6px;border:1px
 #main{display:flex;flex:1;min-height:0;position:relative}
 #stage{position:relative;flex:1;min-width:0;background:#fff;box-shadow:inset 0 0 0 1px #c9d3e3}
 canvas{display:block;touch-action:none;width:100%;height:100%}
+#fileWrap{position:relative}
+#fileMenu{position:absolute;right:0;top:calc(100% + 6px);z-index:30;background:#fff;border:1px solid #47526a;border-radius:10px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:4px;min-width:290px}
+#fileMenu[hidden]{display:none}
+header #fileMenu button{white-space:nowrap;background:#fff;color:#1f2933;border:0;text-align:left;padding:11px 12px;min-height:44px;font-size:15px}
+header #fileMenu button:active{background:#e8eff9}
+#hint[hidden]{display:none}
 #hint{position:absolute;left:10px;right:10px;bottom:10px;background:rgba(31,41,51,.86);color:#fff;padding:8px 12px;border-radius:10px;font-size:13px;line-height:1.55;pointer-events:none}
 #badge{position:absolute;left:10px;top:10px;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700;background:#fff;border:1px solid var(--line);pointer-events:none}
 #toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:#1f2933;color:#fff;padding:9px 16px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%;text-align:center;z-index:9}
@@ -118,8 +124,6 @@ canvas{display:block;touch-action:none;width:100%;height:100%}
     </div>
     <div class="grp" id="gView">
       <button id="bFit">全体表示</button>
-      <button id="bZin">＋</button>
-      <button id="bZout">－</button>
       <label title="壁や家具の位置を、選んだ間隔のます目にそろえます（家具は自由な位置にも置けます）">ます目
         <select id="selStep">
           <option value="910">910mm（1マス）</option>
@@ -133,10 +137,15 @@ canvas{display:block;touch-action:none;width:100%;height:100%}
     <div class="grow"></div>
     <button id="bSide" class="ghost">屋内パネル</button>
     <button id="bSideR" class="ghost">屋外パネル</button>
-    <button id="bNew" class="ghost">新規</button>
-    <button id="bSave">保存</button>
-    <button id="bLoad">読込</button>
-    <button id="bPrint" class="primary">印刷・画像</button>
+    <div id="fileWrap">
+      <button id="bFile" class="primary" aria-haspopup="true">ファイル ▾</button>
+      <div id="fileMenu" hidden>
+        <button id="bNew">新規作成</button>
+        <button id="bSave">保存（ファイルに書き出す）</button>
+        <button id="bLoad">読込（ファイルを開く）</button>
+        <button id="bPrint">印刷・画像保存</button>
+      </div>
+    </div>
   </header>
 
   <div id="toolbar">
@@ -2142,7 +2151,10 @@ function updateUI(){
   else h='線を選択中：ドラッグで平行移動、「壁の長さを数字で変更」で寸法を入力。もう一度同じ線をタップすると図形全体の選択に戻ります。';
   if(ui.mode==='reform'&&ui.tool==='select'&&!ui.editBase&&((sw&&sw.layer==='base')))h='現状の壁を選択中：「撤去にする」で赤い点線（取り壊し）にできます。';
   if(ui.mode==='reform'&&sf&&sf.layer==='base')h='現状の家具です。動かしたり回したりすると、改修後の位置が青で作られ、元の位置は赤い点線になります。';
+  const _hk=ui.mode+'|'+ui.tool+'|'+(ui.placing?1:0)+'|'+(ui.noteTool||'')+'|'+(ui.diag?1:0);
+  if(_hk!==ui.hintKey){ui.hintKey=_hk;ui.hintOff=false;}
   $('#hint').textContent=h;
+  $('#hint').hidden=!!ui.hintOff||!h;
   fillProps();
   $('#secSel').hidden=!$('#pNone').hidden;
   const _r1=stage.getBoundingClientRect();
@@ -2156,6 +2168,7 @@ const pos=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.c
 cv.addEventListener('pointerdown',e=>{
   try{cv.setPointerCapture(e.pointerId);}catch(_){}
   const p=pos(e);ptrs.set(e.pointerId,p);
+  if(!ui.hintOff){ui.hintOff=true;$('#hint').hidden=true;}
   if(ptrs.size===2){startPinch();return;}
   if(ptrs.size>2)return;
   if((e.pointerType==='mouse'&&e.button!==0)||ui.mode==='compare'){g={type:'pan',start:p,o0:{ox:view.ox,oy:view.oy},kind:'pan'};return;}
@@ -2329,8 +2342,6 @@ $('#bDiag').onclick=()=>{ui.diag=!ui.diag;updateUI();toast(ui.diag?'斜めの壁
 $('#bClear').onclick=clearAll;$('#bDelGuide').onclick=delGuide;
 $('#bDel').onclick=delSel;$('#bDup').onclick=dupSel;$('#bLen').onclick=editLength;$('#bRm').onclick=toggleRm;
 $('#bFit').onclick=()=>{ui.autoFit=true;fit();draw();};
-$('#bZin').onclick=()=>{ui.autoFit=false;zoomAt({x:stage.clientWidth/2,y:stage.clientHeight/2},1.25);};
-$('#bZout').onclick=()=>{ui.autoFit=false;zoomAt({x:stage.clientWidth/2,y:stage.clientHeight/2},0.8);};
 $('#bFlip').onclick=()=>{ui.toggleAfter=!ui.toggleAfter;updateUI();draw();};
 $('#bBack').onclick=()=>setMode('reform');
 $('#bDone').onclick=()=>{D.reformDone=true;save();setMode('compare');toast('比較表示にしました。「編集に戻る」でいつでも修正できます');};
@@ -2355,6 +2366,14 @@ $('#bFree').onclick=moveFree;$('#bFDup').onclick=dupFurn;$('#bFNote').onclick=ed
 $('#bSide').onclick=()=>{$('#sideR').classList.remove('open');$('#sideL').classList.toggle('open');};
 $('#bSideR').onclick=()=>{$('#sideL').classList.remove('open');$('#sideR').classList.toggle('open');};
 $('#title').oninput=e=>{D.title=e.target.value;save();};
+(function(){
+  const fm=$('#fileMenu'),fb=$('#bFile');
+  const close=()=>{fm.hidden=true;};
+  fb.onclick=e=>{e.stopPropagation();fm.hidden=!fm.hidden;};
+  fm.addEventListener('click',()=>close());
+  document.addEventListener('pointerdown',e=>{if(!fm.hidden&&!e.target.closest('#fileWrap'))close();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
+})();
 $('#bSave').onclick=exportJson;
 $('#bLoad').onclick=()=>$('#fileIn').click();
 $('#fileIn').onchange=e=>{if(e.target.files[0])importJson(e.target.files[0]);e.target.value='';};
