@@ -90,19 +90,39 @@ header #fileMenu button:active{background:#e8eff9}
 .pi{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:6px 8px;min-height:44px;text-align:left}
 .pi b{font-size:13px;font-weight:600}
 .pi span{font-size:10.5px;color:var(--sub)}
+#gPlace{position:absolute;top:46px;left:10px;right:10px;z-index:4;justify-content:center;padding:6px 10px;border:2px solid #0f766e;border-radius:10px;background:#e6f6f3;box-shadow:0 2px 8px rgba(15,23,42,.2)}
+#gRail{display:none!important}
+#gMulti{position:absolute;top:46px;left:10px;right:10px;z-index:4;justify-content:center;padding:6px 10px;border:2px solid #e8590c;border-radius:10px;background:#fff4e5;box-shadow:0 2px 8px rgba(15,23,42,.2)}
+#gMulti b{font-size:13px;color:#c2410c}
+.side .grp{gap:6px}
+.side #secOps{padding-bottom:4px}
+body.tflow #sideL{background:#f3eefc;border-right-color:#c9b8ec}
+body.tflow #sideL .ptitle{background:#d9cbf3;color:#4a2a86}
+body.tflow #sideL h4,body.tflow #sideL label{color:#5b3f94}
+body.tflow #bSide{background:#d9cbf3;border-color:#a98ee0;color:#4a2a86}
+.side #secOps>.grp,.side #secOps>div{margin-bottom:8px}
+#gNote{display:grid!important;grid-template-columns:1fr 1fr;gap:8px}
+#gNote[hidden]{display:none!important}
+#gNote button{width:100%;padding-left:6px;padding-right:6px;white-space:nowrap}
+.side #nTxt{width:100%!important}
+.side #pNote label,.side #flowEdit label{flex-direction:column;align-items:flex-start;width:100%;gap:3px}
+.side #pNote input{width:100%!important}
+.side #pNote,.side #flowEdit{padding:6px 8px}
 #bSide,#bSideR{display:none}
 body.fold #toolbar,body.fold #gView{display:none}
 .edgeTab{position:absolute;top:42%;z-index:5;align-items:center;justify-content:center;padding:16px 8px;line-height:1.2;min-height:0;font-size:13px;font-weight:700;opacity:.92;box-shadow:0 2px 8px rgba(15,23,42,.25)}
 #bSide{left:0;border-radius:0 12px 12px 0;background:#f4d9a6;border-color:#d9b36a;color:#7a4b00}
 #bSideR{right:0;border-radius:12px 0 0 12px;background:#bfe2c4;border-color:#85bb8c;color:#1f5a2a}
 #bSide[hidden],#bSideR[hidden]{display:none!important}
-body.drawer #bSide,body.drawer #bSideR{display:none!important}
-body.drawers .side{position:absolute;top:0;bottom:0;z-index:6;transition:transform .2s;width:min(262px,80vw)}
-body.drawers #sideL{left:0;transform:translateX(-100%)}
-body.drawers #sideR{right:0;transform:translateX(100%)}
-body.drawers #sideL.open{transform:none;box-shadow:6px 0 18px rgba(15,23,42,.18)}
-body.drawers #sideR.open{transform:none;box-shadow:-6px 0 18px rgba(15,23,42,.18)}
-body.drawers #bSide,body.drawers #bSideR{display:flex;text-align:center}
+body.drawerL #bSide{left:min(262px,80vw)}
+body.drawerR #bSideR{right:min(262px,80vw)}
+@media (max-width:760px){body.drawerL #bSideR,body.drawerR #bSide{display:none!important}}
+#sideL,#sideR{position:absolute;top:0;bottom:0;z-index:6;transition:transform .2s;width:min(262px,80vw)}
+#sideL{left:0;transform:translateX(-100%)}
+#sideR{right:0;transform:translateX(100%)}
+#sideL.open{transform:none;box-shadow:6px 0 18px rgba(15,23,42,.18)}
+#sideR.open{transform:none;box-shadow:-6px 0 18px rgba(15,23,42,.18)}
+#bSide,#bSideR{display:flex;text-align:center}
 @media (max-width:760px){
   header{padding:6px 8px;gap:6px}
   header #title{width:104px}
@@ -137,9 +157,9 @@ body.drawers #bSide,body.drawers #bSideR{display:flex;text-align:center}
       <button id="bFit">全体表示</button>
       <label title="壁や家具の位置を、選んだ間隔のます目にそろえます（家具は自由な位置にも置けます）">ます目
         <select id="selStep">
-          <option value="910">910mm（1マス）</option>
-          <option value="455" selected>455mm（半マス）</option>
-          <option value="91">91mm（細かく）</option>
+          <option value="910">91cm（1マス）</option>
+          <option value="455" selected>45.5cm（半マス）</option>
+          <option value="91">9cm（細かく）</option>
           <option value="0">合わせない</option>
         </select>
       </label>
@@ -154,7 +174,6 @@ body.drawers #bSide,body.drawers #bSideR{display:flex;text-align:center}
         <button id="bSave">保存（ファイルに書き出す）</button>
         <button id="bLoad">読込（ファイルを開く）</button>
         <button id="bPrint">印刷・画像保存</button>
-        <button id="bPanelMode"></button>
       </div>
     </div>
   </header>
@@ -168,47 +187,15 @@ body.drawers #bSide,body.drawers #bSideR{display:flex;text-align:center}
         <button data-tool="flow" id="tFlow">✚ 詳細の追加</button>
       </div>
     </div>
-    <div class="grp" id="gFlow">
-      <label>動線
-        <select id="selArrow"><option value="both">両方向 ↔</option><option value="end">片方向 →（なぞった向き）</option><option value="none">矢印なし</option></select>
-      </label>
-      <span id="flowEdit" class="grp" style="gap:6px;padding:4px 8px;border:2px solid #7c3aed;border-radius:10px;background:#f3ecff">
-        <b style="font-size:13px;color:#6d28d9">選んだ線：</b>
-        <button id="bFl2Del">削除</button>
-        <button id="bFl2Rev">向きを逆にする</button>
-        <label>動線<select id="selFl2Arrow"><option value="both">両方向 ↔</option><option value="end">片方向 →</option><option value="none">矢印なし</option></select></label>
-        <button id="bFl2Dup">複製</button>
-        <button id="bFl2Rm">撤去にする</button>
-      </span>
-    </div>
     <div class="grp" id="gRail"><button id="bAddRail" style="border-color:#0f766e;color:#0f766e;font-weight:700">＋ 手すり</button><button id="bAddPRail" style="border-color:#0f766e;color:#0f766e;font-weight:700">＋ 縦手すり</button><button id="bAddDoor1" style="border-color:#9a3412;color:#9a3412;font-weight:700">＋ 開き戸</button><button id="bAddDoor2" style="border-color:#9a3412;color:#9a3412;font-weight:700">＋ 引き戸</button><button id="bAddDoor0" style="border-color:#9a3412;color:#9a3412;font-weight:700">＋ 開口（扉なし）</button><button id="bAddDoor3" style="border-color:#9a3412;color:#9a3412;font-weight:700">＋ 引き違い戸</button><button id="bAddStep" style="border-color:#9a3412;color:#9a3412;font-weight:700">＋ 段差</button></div>
-    <div class="grp" id="gNote"><button id="bNoteText" style="border-color:#475467;color:#344054;font-weight:700">＋ 文字</button><button id="bNoteNum" style="border-color:#475467;color:#344054;font-weight:700">＋ 番号①</button><button id="bNoteDim" style="border-color:#475467;color:#344054;font-weight:700">＋ 寸法線</button><button id="bNoteVal" style="border-color:#475467;color:#344054;font-weight:700">＋ 数値メモ</button><button id="bNoteCall" style="border-color:#475467;color:#344054;font-weight:700">＋ 吹き出し</button></div>
-    <div class="grp" id="pNote" hidden style="gap:6px;padding:4px 8px;border:2px solid #475467;border-radius:10px;background:#f2f4f7">
-      <b id="nName" style="font-size:13px;color:#344054"></b>
-      <label id="nTxtRow"><span id="nTxtL">文字</span><textarea id="nTxt" rows="1" style="width:200px;height:34px;resize:none;font:inherit;padding:6px;border:1px solid #d0d5dd;border-radius:6px"></textarea></label>
-      <label id="nCmRow"><span id="nCmL">数値(cm)</span><input id="nCm" type="number" step="0.1" inputmode="decimal" style="width:90px"></label>
-      <label id="nNumRow">番号<input id="nNum" type="number" step="1" inputmode="numeric" style="width:70px"></label>
-      <span id="nSzRow" class="grp" style="gap:4px"><button id="bNSm">文字を小さく</button><button id="bNLg">文字を大きく</button></span>
-      <span id="nDimRow"><button id="bNAuto">実測を消す（図の長さに戻す）</button></span>
-      <button id="bNDup">複製</button><button id="bNDel">削除</button>
-    </div>
-    <div class="grp" id="gPlace" style="padding:4px 8px;border:2px solid #0f766e;border-radius:10px;background:#e6f6f3">
-      <b id="placeName" style="font-size:13px;color:#0f766e">置く場所をタップ／クリック（1回置くと終わります）</b>
-      <button id="bPlaceRot">縦横を切り替え</button>
-      <button id="bPlaceAuto">おまかせ配置（部屋に自動）</button>
-      <button id="bPlaceEnd" class="primary">やめる</button>
-    </div>
     <div class="grp" id="gUndo">
       <button id="bUndo">↶ 元に戻す</button>
       <button id="bRedo">↷ やり直す</button>
-      <button id="bDiag" title="ONにすると、なぞった線が斜めのまま壁になります">／ 斜めの壁：OFF</button>
-      <button id="bDelGuide" title="消したい壁を選んで削除します">🗑 壁を消す</button>
+      <span class="grp" id="gDraw">
+          <button id="bDiag" title="ONにすると、なぞった線が斜めのまま壁になります">／ 斜めの壁：OFF</button>
+          <button id="bDelGuide" title="消したい壁を選んで削除します">🗑 壁を消す</button>
+      </span>
       <button id="bClear" class="ghost" title="図面を全部消します（元に戻せます）">全部消す</button>
-    </div>
-    <div class="grp" id="gSel">
-      <button id="bDel">削除</button>
-      <button id="bDup">複製</button>
-      <button id="bRm">撤去にする</button>
     </div>
     <div class="grp" id="gReform">
       <label><input type="checkbox" id="chkEditBase">現状図も修正する</label>
@@ -227,7 +214,38 @@ body.drawers #bSide,body.drawers #bSideR{display:flex;text-align:center}
 
   <div id="main">
     <aside id="sideL" class="side">
-      <div class="ptitle">🏠 屋内（家の中）</div>
+      <div class="ptitle" id="ptL">🏠 屋内（家の中）</div>
+      <section id="secOps">
+    <div class="grp" id="gSel">
+      <button id="bDel">削除</button>
+      <button id="bDup">複製</button>
+      <button id="bRm">撤去にする</button>
+    </div>
+    <div class="grp" id="gFlow">
+      <label>動線
+        <select id="selArrow"><option value="both">両方向 ↔</option><option value="end">片方向 →（なぞった向き）</option><option value="none">矢印なし</option></select>
+      </label>
+      <span id="flowEdit" class="grp" style="gap:6px;padding:4px 8px;border:2px solid #7c3aed;border-radius:10px;background:#f3ecff">
+        <b style="font-size:13px;color:#6d28d9">選んだ線：</b>
+        <button id="bFl2Del">削除</button>
+        <button id="bFl2Rev">向きを逆にする</button>
+        <label>動線<select id="selFl2Arrow"><option value="both">両方向 ↔</option><option value="end">片方向 →</option><option value="none">矢印なし</option></select></label>
+        <button id="bFl2Dup">複製</button>
+        <button id="bFl2Rm">撤去にする</button>
+      </span>
+    </div>
+    <div class="note" id="flowNote">主な移動ルートを、指やマウスでなぞると動線が描けます。文字・番号・寸法線・数値メモ・吹き出しは、下のボタンで追加します。</div>
+    <div class="grp" id="gNote"><button id="bNoteText" style="border-color:#475467;color:#344054;font-weight:700">＋ 文字</button><button id="bNoteNum" style="border-color:#475467;color:#344054;font-weight:700">＋ 番号①</button><button id="bNoteDim" style="border-color:#475467;color:#344054;font-weight:700">＋ 寸法線</button><button id="bNoteVal" style="border-color:#475467;color:#344054;font-weight:700">＋ 数値メモ</button><button id="bNoteCall" style="border-color:#475467;color:#344054;font-weight:700">＋ 吹き出し</button></div>
+    <div class="grp" id="pNote" hidden style="gap:6px;padding:4px 8px;border:2px solid #475467;border-radius:10px;background:#f2f4f7">
+      <b id="nName" style="font-size:13px;color:#344054"></b>
+      <label id="nTxtRow"><span id="nTxtL">文字</span><textarea id="nTxt" rows="1" style="width:200px;height:34px;resize:none;font:inherit;padding:6px;border:1px solid #d0d5dd;border-radius:6px"></textarea></label>
+      <label id="nCmRow"><span id="nCmL">数値(cm)</span><input id="nCm" type="number" step="0.1" inputmode="decimal" style="width:90px"></label>
+      <label id="nNumRow">番号<input id="nNum" type="number" step="1" inputmode="numeric" style="width:70px"></label>
+      <span id="nSzRow" class="grp" style="gap:4px"><button id="bNSm">文字を小さく</button><button id="bNLg">文字を大きく</button></span>
+      <span id="nDimRow"><button id="bNAuto">実測を消す（図の長さに戻す）</button></span>
+      <button id="bNDup">複製</button><button id="bNDel">削除</button>
+    </div>
+      </section>
       <section id="secSel">
         <h4>選択中</h4>
         <div id="pRoom" hidden>
@@ -248,8 +266,8 @@ body.drawers #bSide,body.drawers #bSideR{display:flex;text-align:center}
         <div id="pFurn" hidden>
           <div id="fName" class="fname"></div>
           <div class="fields">
-            <label>幅(mm)<input id="fW" type="number" step="10"></label>
-            <label>奥行(mm)<input id="fH" type="number" step="10"></label>
+            <label>幅(cm)<input id="fW" type="number" step="1" min="10"></label>
+            <label>奥行(cm)<input id="fH" type="number" step="1" min="10"></label>
             <label>角度(°)<input id="fR" type="number" step="5"></label>
           </div>
           <div class="btns">
@@ -265,17 +283,17 @@ body.drawers #bSide,body.drawers #bSideR{display:flex;text-align:center}
           </div>
           <div id="pDoorX" hidden>
             <div class="btns"><button id="bDoorFs">開く向きを反転</button><button id="bDoorHs">左右を反転</button></div>
-            <div class="fields" id="lvField"><label>段差の高さ(mm)<input id="fLv" type="number" step="5"></label></div>
+            <div class="fields" id="lvField"><label>段差の高さ(cm)<input id="fLv" type="number" step="0.5" min="0"></label></div>
           </div>
           <div id="fWarn" class="warnbox" hidden></div>
           <div class="note" style="margin-top:8px">選択中は、上の○をドラッグで回転、四隅の□をドラッグで大きさを変えられます（つかんだ角の反対側は動きません）。</div>
         </div>
       </section>
-      <section>
+      <section id="secPal">
         <h4>家具・印を追加</h4>
         <div id="palette"></div>
       </section>
-      <section>
+      <section id="secUse">
         <h4>使い方</h4>
         <div id="pNone" class="note">家具や印をタップで選択できます。部屋の床をタップすると、その部屋の役割（寝室・浴室など）を決められます。決めた部屋はうすく色づきます。</div>
         <div class="note" style="margin-top:6px">追加ボタンを押すと、マウスの位置に見本が出ます。置きたい場所を1回タップ（クリック）すると置かれます。</div>
@@ -286,6 +304,13 @@ body.drawers #bSide,body.drawers #bSideR{display:flex;text-align:center}
       <div id="badge"></div>
       <button id="bSide" class="edgeTab" aria-label="屋内パネルを開く">屋内<br>▶</button>
       <button id="bSideR" class="edgeTab" aria-label="屋外パネルを開く">屋外<br>◀</button>
+    <div class="grp" id="gPlace">
+      <b id="placeName" style="font-size:13px;color:#0f766e">置く場所をタップ／クリック（1回置くと終わります）</b>
+      <button id="bPlaceRot">縦横を切り替え</button>
+      <button id="bPlaceAuto">おまかせ配置（部屋に自動）</button>
+      <button id="bPlaceEnd" class="primary">やめる</button>
+    </div>
+      <div id="gMulti" class="grp" hidden><b id="multiTxt"></b><button id="bMultiDel" class="primary">まとめて削除</button><button id="bMultiClear">選択をやめる</button></div>
       <div id="hint"></div>
       <div id="toast"></div>
     </div>
@@ -890,7 +915,7 @@ function drawFurn(ctx,f,v,k,it){
     drawOpening(ctx,f,v,k,it);ctx.restore();
     if(DEF[t].stepmark){
       const a2=f.r*PI/180,bh=(f.w*Math.abs(Math.sin(a2))+f.h*Math.abs(Math.cos(a2)))*v.s/2;
-      const txt=f.note||('段差'+(f.lv?' '+f.lv:''));
+      const txt=f.note||('段差'+(f.lv?' '+(Math.round(f.lv)/10)+'cm':''));
       ctx.font=`bold ${11*k}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';
       const tx=f.x*v.s+v.ox,ty=f.y*v.s+v.oy-bh-9*k;
       ctx.lineWidth=3*k;ctx.strokeStyle='rgba(255,255,255,.92)';ctx.strokeText(txt,tx,ty);
@@ -1330,6 +1355,11 @@ function panel(ctx,w,h,kind,o){
     ctx.save();ctx.globalAlpha=.6;drawFurn(ctx,gf,v,k,{});ctx.restore();
     const gx=gf.x*v.s+v.ox,gy=gf.y*v.s+v.oy;ctx.strokeStyle='#0f766e';ctx.lineWidth=2;ctx.beginPath();ctx.arc(gx,gy,9,0,PI*2);ctx.stroke();
   }
+  if(o.sel&&ui.sel&&ui.sel.type==='multi'&&ui.sel.layer===editLayer())drawMultiSel(ctx,v);
+  if(o.gesture&&g&&g.kind==='marq'&&g.p1){
+    const x=Math.min(g.p0.x,g.p1.x),y=Math.min(g.p0.y,g.p1.y),w=Math.abs(g.p1.x-g.p0.x),hh=Math.abs(g.p1.y-g.p0.y);
+    ctx.save();ctx.fillStyle='rgba(26,108,240,.10)';ctx.fillRect(x,y,w,hh);ctx.strokeStyle='#1a6cf0';ctx.lineWidth=1.8;ctx.setLineDash([7,5]);ctx.strokeRect(x,y,w,hh);ctx.restore();
+  }
   // 描いている途中の線
   if(o.gesture&&g&&(g.type==='draw'||g.type==='flowdraw')){
     ctx.strokeStyle=g.type==='flowdraw'?'rgba(124,58,237,.7)':(editLayer()==='reform'?'rgba(26,108,240,.6)':'rgba(35,39,46,.55)');
@@ -1379,7 +1409,9 @@ function hitWall(px,py){
     for(const w of L.walls){
       const A=nm.get(w.a),B=nm.get(w.b);
       const d=distSeg(px,py,A.x*view.s+view.ox,A.y*view.s+view.oy,B.x*view.s+view.ox,B.y*view.s+view.oy);
-      if(d<bd){bd=d;best={kind:'wall',layer:ln,id:w.id};}
+      const sel=ui.sel&&(ui.sel.type==='wall'||ui.sel.type==='figure')&&ui.sel.layer===ln&&ui.sel.ids.has(w.id);
+      const dd=sel?d-6:d;
+      if(dd<bd){bd=dd;best={kind:'wall',layer:ln,id:w.id};}
     }
     if(best)return best;
   }
@@ -1413,6 +1445,97 @@ function hitFlow(p){
   return best;
 }
 function furnHandleOk(f){return f.layer===editLayer()||(f.layer==='base'&&ui.mode==='reform'&&!ui.editBase&&!f.rm);}
+
+// ---- 範囲選択（まとめて移動・削除）----
+function multiEmpty(m){return!(m.furn.size||m.flows.size||m.notes.size||m.walls.size);}
+function multiCollect(a,b){
+  const el=editLayer(),L=D[el],nm=nodeMap(L);
+  const x1=Math.min(a.x,b.x),x2=Math.max(a.x,b.x),y1=Math.min(a.y,b.y),y2=Math.max(a.y,b.y);
+  const inR=q=>q.x>=x1&&q.x<=x2&&q.y>=y1&&q.y<=y2;
+  const m={type:'multi',layer:el,furn:new Set(),flows:new Set(),notes:new Set(),walls:new Set()};
+  for(const f of D.furn)if(f.layer===el&&visibleFurn().includes(f)&&inR({x:f.x,y:f.y}))m.furn.add(f.id);
+  for(const fl of D.flows)if(fl.layer===el&&fl.pts.some(inR))m.flows.add(fl.id);
+  for(const n of visibleNotes())if(n.layer===el&&notePts(n).some(inR))m.notes.add(n.id);
+  for(const w of L.walls){const A=nm.get(w.a),B=nm.get(w.b);if(A&&B&&inR(A)&&inR(B))m.walls.add(w.id);}
+  return m;
+}
+function multiPts(m){
+  const L=D[m.layer],nm=nodeMap(L),out=[];
+  for(const f of D.furn)if(m.furn.has(f.id))for(const[sx,sy]of[[1,1],[-1,1],[1,-1],[-1,-1]]){const q=cornerPos(f,sx,sy);out.push({x:(q.x-view.ox)/view.s,y:(q.y-view.oy)/view.s});}
+  for(const fl of D.flows)if(m.flows.has(fl.id))out.push(...fl.pts);
+  for(const n of D.notes)if(m.notes.has(n.id))out.push(...notePts(n));
+  for(const w of L.walls)if(m.walls.has(w.id)){out.push(nm.get(w.a),nm.get(w.b));}
+  return out;
+}
+function multiBoxScreen(m){
+  const pts=multiPts(m);if(!pts.length)return null;
+  let x1=1e9,y1=1e9,x2=-1e9,y2=-1e9;
+  for(const q of pts){const x=q.x*view.s+view.ox,y=q.y*view.s+view.oy;x1=Math.min(x1,x);y1=Math.min(y1,y);x2=Math.max(x2,x);y2=Math.max(y2,y);}
+  return{x1:x1-10,y1:y1-10,x2:x2+10,y2:y2+10};
+}
+function inMultiBox(p){
+  const s=ui.sel;if(!s||s.type!=='multi')return false;
+  const b=multiBoxScreen(s);return!!b&&p.x>=b.x1&&p.x<=b.x2&&p.y>=b.y1&&p.y<=b.y2;
+}
+function multiCount(m){return m.furn.size+m.flows.size+m.notes.size+m.walls.size;}
+function drawMultiSel(ctx,v){
+  const m=ui.sel,L=D[m.layer],nm=nodeMap(L);
+  ctx.save();ctx.lineJoin='round';
+  ctx.strokeStyle='rgba(232,89,12,.45)';ctx.lineWidth=10;ctx.lineCap='round';
+  for(const w of L.walls)if(m.walls.has(w.id)){const A=nm.get(w.a),B=nm.get(w.b);ctx.beginPath();ctx.moveTo(A.x*v.s+v.ox,A.y*v.s+v.oy);ctx.lineTo(B.x*v.s+v.ox,B.y*v.s+v.oy);ctx.stroke();}
+  ctx.strokeStyle='rgba(245,159,0,.5)';ctx.lineWidth=9;
+  for(const fl of D.flows)if(m.flows.has(fl.id)){ctx.beginPath();fl.pts.forEach((q,i)=>{const x=q.x*v.s+v.ox,y=q.y*v.s+v.oy;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);});ctx.stroke();}
+  ctx.strokeStyle='#e8590c';ctx.lineWidth=2.5;
+  for(const f of D.furn)if(m.furn.has(f.id)){
+    const c=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([sx,sy])=>cornerPos(f,sx,sy));
+    ctx.beginPath();c.forEach((q,i)=>i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y));ctx.closePath();ctx.stroke();
+  }
+  for(const n of D.notes)if(m.notes.has(n.id))for(const q of notePts(n)){ctx.beginPath();ctx.arc(q.x*v.s+v.ox,q.y*v.s+v.oy,9,0,PI*2);ctx.stroke();}
+  const b=multiBoxScreen(m);
+  if(b){ctx.setLineDash([7,5]);ctx.lineWidth=1.8;ctx.strokeRect(b.x1,b.y1,b.x2-b.x1,b.y2-b.y1);}
+  ctx.restore();
+}
+function startMultiMove(){
+  const m=ui.sel,L=D[m.layer],nm=nodeMap(L);
+  g.pre=JSON.stringify(D);g.kind='mmove';g.L=L;g.m=m;
+  g.nodeIds=new Set();for(const w of L.walls)if(m.walls.has(w.id)){g.nodeIds.add(w.a);g.nodeIds.add(w.b);}
+  g.orig=new Map();for(const id of g.nodeIds){const n=nm.get(id);g.orig.set(id,{x:n.x,y:n.y});}
+  g.fo=new Map(D.furn.filter(f=>m.furn.has(f.id)).map(f=>[f,{x:f.x,y:f.y}]));
+  g.flo=new Map(D.flows.filter(f=>m.flows.has(f.id)).map(f=>[f,f.pts.map(q=>({x:q.x,y:q.y}))]));
+  g.no=new Map(D.notes.filter(n=>m.notes.has(n.id)).map(n=>[n,JSON.parse(JSON.stringify(n))]));
+  g.mids=[...m.walls].map(id=>{const w=L.walls.find(x=>x.id===id),A=nm.get(w.a),B=nm.get(w.b);return{x:(A.x+B.x)/2,y:(A.y+B.y)/2};});
+  g.delta={x:0,y:0};ui.dragging=true;
+}
+function applyMultiMove(dx,dy){
+  const st=ui.step>0?ui.step:10,ax=Math.round(dx/st)*st,ay=Math.round(dy/st)*st,nm=nodeMap(g.L);
+  for(const[id,o]of g.orig){const n=nm.get(id);n.x=o.x+ax;n.y=o.y+ay;}
+  for(const[f,o]of g.fo){f.x=o.x+ax;f.y=o.y+ay;}
+  for(const[f,pts]of g.flo)f.pts.forEach((q,i)=>{q.x=pts[i].x+ax;q.y=pts[i].y+ay;});
+  for(const[n,o]of g.no){
+    if(n.k==='dim'){n.a={x:o.a.x+ax,y:o.a.y+ay};n.b={x:o.b.x+ax,y:o.b.y+ay};}
+    else{n.x=o.x+ax;n.y=o.y+ay;if(n.k==='call'){n.tx=o.tx+ax;n.ty=o.ty+ay;}}
+  }
+  g.delta={x:ax,y:ay};
+}
+function finishMultiMove(gg){
+  ui.dragging=false;
+  if(!gg.delta.x&&!gg.delta.y){draw();return;}
+  const L=gg.L,m=gg.m;
+  normalize(L);
+  const ws=new Set();
+  for(const q of gg.mids){const id=wallAtPoint(L,{x:q.x+gg.delta.x,y:q.y+gg.delta.y});if(id!=null)ws.add(id);}
+  m.walls=ws;
+  commit(gg.pre);
+}
+function delMulti(){
+  const m=ui.sel;if(!m||m.type!=='multi')return;
+  const pre=JSON.stringify(D),L=D[m.layer];
+  D.furn=D.furn.filter(f=>!m.furn.has(f.id));
+  D.flows=D.flows.filter(f=>!m.flows.has(f.id));
+  D.notes=D.notes.filter(n=>!m.notes.has(n.id));
+  L.walls=L.walls.filter(w=>!m.walls.has(w.id));normalize(L);
+  ui.sel=null;commit(pre);toast(multiCount(m)+'個を削除しました（「元に戻す」で取り消せます）');
+}
 function hitHandle(p){
   const s=ui.sel;
   if(s&&s.type==='flow'){
@@ -1549,6 +1672,8 @@ function editableFurn(){
 }
 function beginDrag(){
   const h=g.hit;
+  if(g.multi&&ui.sel&&ui.sel.type==='multi'){startMultiMove();return;}
+  if(!h&&ui.tool==='select'&&ui.mode!=='compare'&&editLayer()){g.kind='marq';g.p0=g.start;g.p1=g.start;ui.sel=null;updateUI();return;}
   if(h&&h.kind==='handle'&&(h.which==='na'||h.which==='nb'||h.which==='nt')){
     g.pre=JSON.stringify(D);g.kind='nh';g.n=curNote();g.which=h.which;ui.dragging=true;return;
   }
@@ -1608,6 +1733,8 @@ function beginDrag(){
 function applyDrag(p){
   if(g.kind==='pan'){view.ox=g.o0.ox+p.x-g.start.x;view.oy=g.o0.oy+p.y-g.start.y;draw();return;}
   const dx=(p.x-g.start.x)/view.s,dy=(p.y-g.start.y)/view.s;
+  if(g.kind==='marq'){g.p1=p;draw();return;}
+  if(g.kind==='mmove'){applyMultiMove(dx,dy);draw();return;}
   if(g.kind==='nmove'){
     const ax=Math.round(dx/10)*10,ay=Math.round(dy/10)*10,n=g.n,o=g.o;
     if(n.k==='dim'){n.a={x:o.a.x+ax,y:o.a.y+ay};n.b={x:o.b.x+ax,y:o.b.y+ay};}
@@ -1661,13 +1788,23 @@ function applyDrag(p){
 }
 function cancelDrag(gg){
   ui.dragging=false;
-  if(gg.kind==='fmove'||gg.kind==='frot'||gg.kind==='fsize'||gg.kind==='flmove'||gg.kind==='flv'||gg.kind==='nmove'||gg.kind==='nh'){D=fixData(JSON.parse(gg.pre));ui.sel=null;afterChange();return;}
+  if(gg.kind==='marq'){gg.p1=null;draw();return;}
+  if(gg.kind==='fmove'||gg.kind==='mmove'||gg.kind==='frot'||gg.kind==='fsize'||gg.kind==='flmove'||gg.kind==='flv'||gg.kind==='nmove'||gg.kind==='nh'){D=fixData(JSON.parse(gg.pre));ui.sel=null;afterChange();return;}
   if(gg.kind==='fig'||gg.kind==='chain'||gg.kind==='wend'){const nm=nodeMap(gg.L);for(const[id,o]of gg.orig){const n=nm.get(id);n.x=o.x;n.y=o.y;}}
   draw();
 }
 function finishDrag(gg){
   ui.dragging=false;
   if(gg.kind==='pan')return;
+  if(gg.kind==='marq'){
+    const a=s2w(gg.p0),b=s2w(gg.p1||gg.p0);gg.p1=null;
+    const m=multiCollect(a,b);
+    ui.sel=multiEmpty(m)?null:m;
+    updateUI();draw();
+    if(ui.sel&&innerWidth<=1200)setDrawer(null);
+    return;
+  }
+  if(gg.kind==='mmove'){finishMultiMove(gg);return;}
   if((gg.kind==='fmove'||gg.kind==='fsize')&&DEF[gg.f.t]&&(DEF[gg.f.t].rail||DEF[gg.f.t].vrail||DEF[gg.f.t].door||DEF[gg.f.t].stepmark)){
     if(gg.kind==='fmove')snapAny(gg.f,450,false);
     if(DEF[gg.f.t].rail&&mergeRails(gg.f))toast('手すりを結合しました（直線・L字）');
@@ -1874,6 +2011,7 @@ function delGuide(){
 // ---- 壁の操作 ----
 function delSel(){
   const s=ui.sel;if(!s)return;
+  if(s.type==='multi'){delMulti();return;}
   if(s.type==='flow'){delFlow();return;}
   if(s.type==='note'){delNote();return;}
   if(s.type==='furn'){delOrRmFurn();return;}
@@ -1887,7 +2025,7 @@ function dupSel(){
   if(s.type==='note'){dupNote();return;}
   if(s.type==='furn'){dupFurn();return;}
   if(s.type!=='figure'||s.layer!==editLayer())return;
-  const L=D[s.layer],pre=JSON.stringify(D),nm=nodeMap(L),map=new Map(),off=910;
+  const L=D[s.layer],pre=JSON.stringify(D),nm=nodeMap(L),map=new Map(),st0=ui.step>0?ui.step:455,off=Math.ceil(Math.max(910,110/view.s)/st0)*st0;
   let probe=null;
   for(const w of L.walls.filter(w=>s.ids.has(w.id))){
     for(const id of[w.a,w.b])if(!map.has(id)){const n=nm.get(id),nn={id:nid(),x:n.x+off,y:n.y+off};L.nodes.push(nn);map.set(id,nn.id);}
@@ -1897,7 +2035,7 @@ function dupSel(){
   normalize(L);
   const wid=probe?wallAtPoint(L,probe):null;
   ui.sel=wid!=null?{layer:s.layer,type:'figure',ids:component(L,wid)}:null;
-  commit(pre);toast('複製しました（右下にずらして配置）。そのまま壁をドラッグして位置を調整できます');
+  commit(pre);toast('複製しました（右下にずらしてあります）。そのままドラッグして位置を調整できます');
 }
 function toggleRm(){
   const s=ui.sel;if(!s||ui.mode!=='reform'||ui.editBase)return;
@@ -1992,7 +2130,7 @@ function applyField(key,val){
   const pre=JSON.stringify(D),f=editableFurn();if(!f){updateUI();return;}
   if(key==='w')f.w=clamp(Math.round(val),100,9000);
   else if(key==='h')f.h=clamp(Math.round(val),100,9000);
-  else if(key==='lv'){f.lv=clamp(Math.round(val),0,3000);}
+  else if(key==='lv'){f.lv=clamp(Math.round(val/5)*5,0,3000);}
   else f.r=((Math.round(val)%360)+360)%360;
   commit(pre);
 }
@@ -2071,7 +2209,8 @@ function fillProps(){
     const nm=(DEF[f.t]?DEF[f.t].n:'')+(f.layer==='reform'?'（改修で追加）':'')+(f.rm?'（撤去予定）':'');
     $('#fName').textContent=nm;
     const set=(sel,val)=>{const el=$(sel);if(document.activeElement!==el)el.value=Math.round(val);};
-    set('#fW',f.w);set('#fH',f.h);set('#fR',f.r);
+    const setCm=(sel,mm)=>{const el=$(sel);if(document.activeElement!==el)el.value=Math.round(mm)/10;};
+    setCm('#fW',f.w);setCm('#fH',f.h);set('#fR',f.r);
     {const dd=DEF[f.t];$('#pDoorX').hidden=!(dd&&(dd.door||dd.stepmark));
      if(dd&&dd.door){
        $('#lvField').hidden=true;
@@ -2080,7 +2219,7 @@ function fillProps(){
        $('#bDoorHs').textContent=dd.door==='swing'?'吊元の左右を反転':(dd.door==='slide'?'滑る向きを反転':'前後の重なりを反転');
      }else if(dd&&dd.stepmark){
        $('#lvField').hidden=false;$('#bDoorFs').hidden=true;$('#bDoorHs').hidden=false;$('#bDoorHs').textContent='形を N ⇄ Z に切り替え';
-       set('#fLv',f.lv||0);
+       setCm('#fLv',f.lv||0);
      }}
     const can=f.layer===editLayer()||(f.layer==='base'&&ui.mode==='reform'&&!ui.editBase&&!f.rm);
     ['#fW','#fH','#fR','#bRot90','#bRotM','#bRotP','#bFree','#bFNote','#fLv','#bDoorFs','#bDoorHs'].forEach(q=>{$(q).disabled=!can;});
@@ -2110,10 +2249,9 @@ function updateUI(){
   $('#tabCompare').classList.toggle('dis',!D.reformDone);
   $$('#tools button').forEach(b=>b.classList.toggle('on',b.dataset.tool===ui.tool));
   $$('#cmps button').forEach(b=>b.classList.toggle('on',b.dataset.cmp===ui.cmp));
-  $('#gTool').hidden=!edit;$('#gUndo').hidden=!edit;$('#gSel').hidden=!edit||ui.tool!=='select';
+  $('#gTool').hidden=!edit;$('#gUndo').hidden=!edit;
   $('#gReform').hidden=ui.mode!=='reform';$('#gCmp').hidden=ui.mode!=='compare';
-  $('#bDelGuide').hidden=ui.tool!=='draw';
-  $('#bDiag').hidden=ui.tool!=='draw';$('#bDiag').textContent=ui.diag?'／ 斜めの壁：ON':'／ 斜めの壁：OFF';$('#bDiag').classList.toggle('on',!!ui.diag);
+$('#bDiag').textContent=ui.diag?'／ 斜めの壁：ON':'／ 斜めの壁：OFF';$('#bDiag').classList.toggle('on',!!ui.diag);
   $('#gRail').hidden=!(edit&&ui.tool==='select'&&el);
   $('#gNote').hidden=!(edit&&ui.tool==='flow'&&el);
   $('#gPlace').hidden=!(((ui.placing&&ui.tool==='select')||(ui.noteTool&&ui.tool==='flow'))&&edit);
@@ -2127,9 +2265,21 @@ function updateUI(){
    if(f){$('#selFl2Arrow').value=f.arrow||'both';
      $('#bFl2Del').hidden=!ok;$('#bFl2Rev').hidden=!ok;$('#bFl2Dup').hidden=!el;$('#bFl2Rm').hidden=!(inRef&&f.layer==='base');
      $('#selFl2Arrow').parentNode.hidden=!ok;$('#bFl2Rm').textContent=f.rm?'撤去を取り消す':'撤去にする';}}
-  const showP=edit&&ui.tool==='select';
-  $('#sideL').hidden=!showP;$('#sideR').hidden=!showP;
-  $('#bSide').hidden=!showP;$('#bSideR').hidden=!showP;
+  const showL=edit&&ui.tool!=='draw',showP=edit&&ui.tool==='select';
+  $('#ptL').textContent=ui.tool==='flow'?'✚ 詳細の追加':'🏠 屋内（家の中）';document.body.classList.toggle('tflow',ui.tool==='flow');
+  $('#sideL').hidden=!showL;$('#sideR').hidden=!showP;
+  $('#bSide').hidden=!showL;$('#bSideR').hidden=!showP;
+  $('#secPal').hidden=!showP;$('#secUse').hidden=!showP;
+  if(!showP)$('#secSel').hidden=true;
+  $('#gDraw').hidden=ui.tool!=='draw';
+  $('#gMulti').hidden=!(edit&&s&&s.type==='multi');
+  if(s&&s.type==='multi')$('#multiTxt').textContent=multiCount(s)+'個を選択中';
+  $('#flowNote').hidden=ui.tool!=='flow';
+  $('#gSel').hidden=!(edit&&ui.tool==='select'&&sw);
+  {const so=$('#secOps');so.hidden=![...so.children].some(c=>!c.hidden);}
+  {const k=s?(s.type+':'+(s.id!==undefined?s.id:'')):'';
+   if(k!==ui._selKey){ui._selKey=k;
+     if(s&&edit&&(s.type==='note'||(s.type==='flow'&&ui.tool==='flow')))setDrawer('L');}}
   $('#bFlip').hidden=ui.cmp!=='toggle';
   $('#bUndo').disabled=!undoStack.length;$('#bRedo').disabled=!redoStack.length;
   $('#bDel').disabled=!((sw&&sw.layer===el)||(sf&&sf.layer===el)||(sfl&&sfl.layer===el)||(snt&&snt.layer===el));
@@ -2153,13 +2303,14 @@ function updateUI(){
   if(ui.mode==='compare')h='ピンチ・ホイールで拡大縮小、ドラッグで移動。「編集に戻る」で修正できます（修正後はもう一度「改修完了」で更新）。';
   else if(ui.tool==='draw'&&ui.diag)h='斜めの壁ONです：始点から終点まで、まっすぐなぞってください。壁の角に近づけると吸い付き、横・縦や45°などに近いときは自動でそろいます。「斜めの壁：ON」をもう一度押すとOFFに戻ります。';
   else if(ui.tool==='draw')h='壁をざっくり指やマウスでなぞって離すと、まっすぐな線に自動で直ります。四角い部屋は始点に戻って閉じてください。家具・屋外のパネルは、「選ぶ・動かす」に切り替えると出ます。';
-  else if(ui.noteTool)h='置く場所を1回タップ（クリック）すると置かれます。置いたあと、上の入力欄で文字や数値(cm)を入力できます。やめるときは「やめる」かEscキーを押します。';
-  else if(s&&s.type==='note')h='注釈を選択中：ドラッグで移動。寸法線は端の○、吹き出しは先端の○をドラッグして指す場所を合わせます。文字や数値は、上の入力欄で入力します。';
+  else if(ui.noteTool)h='置く場所を1回タップ（クリック）すると置かれます。置いたあと、左のパネルの入力欄で文字や数値(cm)を入力できます。やめるときは「やめる」かEscキーを押します。';
+  else if(s&&s.type==='note')h='注釈を選択中：ドラッグで移動。寸法線は端の○、吹き出しは先端の○をドラッグして指す場所を合わせます。文字や数値は、左のパネルの入力欄で入力します。';
   else if(ui.placing)h='置きたい場所を1回タップ（クリック）すると置かれます。手すりは、壁に近づけると少し隙間をあけて寄ります。やめるときは「やめる」かEscキーを押します。部屋に自動で置きたいときは「おまかせ配置」を押します。';
-  else if(ui.tool==='flow'&&s&&s.type==='flow')h='線を選択中：線をドラッグで移動、○で端や曲がり角を動かせます。上の「削除」などで修正できます。何もない所をタップすると選択をやめます。';
-  else if(ui.tool==='flow')h='主な移動ルートを、指やマウスでなぞると動線が描けます。文字・番号・寸法線・数値メモ・吹き出しは、上のボタンで追加します。';
+  else if(ui.tool==='flow'&&s&&s.type==='flow')h='線を選択中：線をドラッグで移動、○で端や曲がり角を動かせます。左のパネルの「削除」などで修正できます。何もない所をタップすると選択をやめます。';
+  else if(ui.tool==='flow')h='';
   else if(s&&s.type==='flow')h='動線を選択中：線をドラッグで移動、○をドラッグで端や曲がり角を動かせます。左のパネルで矢印の種類や向きを変えられます。';
-  else if(!s)h='壁：タップで図形ごと選択、ドラッグで移動。家具：タップで選択、ドラッグで移動。部屋の床をタップすると役割を決められます。空いた所のドラッグで画面を移動。';
+  else if(s&&s.type==='multi')h='まとめて選択中：選んだ範囲の中をドラッグすると全部いっしょに動きます。上の「まとめて削除」で消せます。何もない所をタップすると選択をやめます。';
+  else if(!s)h='壁：タップで図形ごと選択、ドラッグで移動。家具：タップで選択、ドラッグで移動。部屋の床をタップすると役割を決められます。空いた所をドラッグすると範囲選択（まとめて移動・削除）。画面の移動は、右クリックしたままドラッグ（タッチは2本指）。';
   else if(s.type==='room')h='部屋を選択中：右の「この部屋は」で役割を決めると、役割に合う家具を自動で置けます。';
   else if(s.type==='furn')h='家具を選択中：ドラッグで移動、○で回転、四隅の□で大きさ変更（反対側の角は固定）。赤い枠は壁との重なりです。右のボタンで「空きスペースへ移動」もできます。';
   else if(s.type==='figure')h='図形を選択中：「削除」「複製」ができます。選択中の壁をドラッグすると図形ごと動きます。もう一度壁をタップするとその線だけを選択。';
@@ -2171,7 +2322,7 @@ function updateUI(){
   $('#hint').textContent=h;
   $('#hint').hidden=!!ui.hintOff||!h;
   fillProps();
-  $('#secSel').hidden=!$('#pNone').hidden;
+  $('#secSel').hidden=!$('#pNone').hidden||!showP;
   const _r1=stage.getBoundingClientRect();
   if(view&&(Math.abs(_r0.left-_r1.left)>.5||Math.abs(_r0.top-_r1.top)>.5||Math.abs(_r0.width-_r1.width)>.5)){
     if(ui.autoFit)fit();else{view.ox+=_r0.left-_r1.left;view.oy+=_r0.top-_r1.top;}
@@ -2193,7 +2344,7 @@ cv.addEventListener('pointerdown',e=>{
   else if(ui.tool==='draw'||ui.tool==='flow')g={type:ui.tool==='flow'?'flowdraw':'draw',pts:[s2w(p)],last:p};
   else{
     const hit=hitHandle(p)||hitFlow(p)||hitFurn(p,false)||hitWall(p.x,p.y)||hitFurn(p,true);
-    g={type:'sel',start:p,hit,moved:false};
+    g={type:'sel',start:p,hit,moved:false,multi:inMultiBox(p)};
   }
   draw();
 });
@@ -2269,7 +2420,7 @@ function sheetCanvas(opt,mono){
   if(opt!=='before'){leg(nx,C.reform,false,mono?'太い線：改修で追加・変更':'青：改修で追加・変更',mono?15:7);nx=790;if(opt==='side'){leg(nx,C.rm,true,'赤の点線（左図）：撤去');nx=1210;}}
   if(D.furn.some(f=>f.t==='zone')){x.fillStyle='rgba(255,92,140,.35)';x.fillRect(nx,ly-14,60,28);x.strokeStyle='rgba(226,60,112,.95)';x.lineWidth=3;x.strokeRect(nx,ly-14,60,28);x.fillStyle='#475467';x.fillText('ピンク：課題の範囲',nx+74,ly);}
   if(D.flows.length){const lx=nx+(D.furn.some(f=>f.t==='zone')?400:0);x.strokeStyle=FLOW_COL;x.lineWidth=7;x.beginPath();x.moveTo(lx,ly);x.lineTo(lx+60,ly);x.stroke();arrowHead(x,lx+60,ly,0,26,FLOW_COL);x.fillStyle='#475467';x.fillText('紫：動線（人・車の通り道）',lx+84,ly);}
-  x.fillStyle='#98a2b3';x.textAlign='right';x.fillText('数字はmm／家具の大きさは目安',W-60,ly);
+  x.fillStyle='#98a2b3';x.textAlign='right';x.fillText('数字はcm／家具の大きさは目安',W-60,ly);
   if(mono){
     const im=x.getImageData(0,0,W,H),d=im.data;
     for(let i=0;i<d.length;i+=4){const y=Math.round(d[i]*.299+d[i+1]*.587+d[i+2]*.114);d[i]=d[i+1]=d[i+2]=y;}
@@ -2319,7 +2470,7 @@ function importJson(file){
     const wrap=document.createElement('div');wrap.className='gl';
     gp.items.forEach(it=>{
       const b=document.createElement('button');b.className='pi';
-      b.innerHTML=`<b>${it.n}</b><span>${it.door?'壁に置くと開口になります':it.stepmark?'Z形の記号（N形にも切替可）':it.vrail?'天井から見た丸印':it.rail?'壁・物のそばに寄ります':(it.zone?'ピンクで範囲を示す':(it.area?'範囲（広さを変更可）':it.w+'×'+it.h))}</span>`;
+      b.innerHTML=`<b>${it.n}</b><span>${it.door?'壁に置くと開口になります':it.stepmark?'Z形の記号（N形にも切替可）':it.vrail?'天井から見た丸印':it.rail?'壁・物のそばに寄ります':(it.zone?'ピンクで範囲を示す':(it.area?'範囲（広さを変更可）':(it.w/10)+'×'+(it.h/10)+'cm'))}</span>`;
       b.onclick=()=>startPlace(it.k);wrap.appendChild(b);
     });
     el.appendChild(wrap);
@@ -2332,7 +2483,7 @@ function importJson(file){
 
 // ---- ボタン ----
 $$('#tabs button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
-$$('#tools button').forEach(b=>b.onclick=()=>{ui.tool=b.dataset.tool;ui.sel=null;ui.placing=null;ui.noteTool=null;ui.dimA=null;ui.ghost=null;updateUI();draw();});
+$$('#tools button').forEach(b=>b.onclick=()=>{ui.tool=b.dataset.tool;ui.sel=null;ui.placing=null;ui.noteTool=null;ui.dimA=null;ui.ghost=null;updateUI();draw();if(ui.tool==='select')setDrawer('L');else if(ui.tool==='draw')setDrawer(null);});
 $$('#cmps button').forEach(b=>b.onclick=()=>{ui.cmp=b.dataset.cmp;fit();updateUI();draw();});
 $('#bUndo').onclick=undo;$('#bRedo').onclick=redo;
 $('#bAddRail').onclick=()=>startPlace('rail');
@@ -2355,6 +2506,7 @@ $('#bPlaceAuto').onclick=()=>{const k=ui.placing;if(k)addFurn(k);};
 $('#bPlaceRot').onclick=()=>{ui.placeRot=!ui.placeRot;draw();};
 $('#bDiag').onclick=()=>{ui.diag=!ui.diag;updateUI();toast(ui.diag?'斜めの壁：ON。始点から終点まで、まっすぐなぞると斜めの壁になります（壁の角には吸い付きます）':'斜めの壁：OFF。なぞった線は、横・縦のまっすぐな壁に直ります');};
 $('#bClear').onclick=clearAll;$('#bDelGuide').onclick=delGuide;
+$('#bMultiDel').onclick=delMulti;$('#bMultiClear').onclick=()=>{ui.sel=null;updateUI();draw();};
 $('#bDel').onclick=delSel;$('#bDup').onclick=dupSel;$('#bRm').onclick=toggleRm;
 $('#bFit').onclick=()=>{ui.autoFit=true;fit();draw();};
 $('#bFlip').onclick=()=>{ui.toggleAfter=!ui.toggleAfter;updateUI();draw();};
@@ -2370,24 +2522,17 @@ $('#selFlowArrow').onchange=e=>flowArrowSet(e.target.value);
 $('#selFl2Arrow').onchange=e=>flowArrowSet(e.target.value);
 $('#bFl2Del').onclick=delFlow;$('#bFl2Rev').onclick=flowReverse;$('#bFl2Dup').onclick=dupFlow;$('#bFl2Rm').onclick=toggleRm;
 $('#bFlowRev').onclick=flowReverse;$('#bFlowDup').onclick=dupFlow;$('#bFlowDel').onclick=delFlow;
-$('#fW').onchange=e=>applyField('w',parseFloat(e.target.value));
-$('#fH').onchange=e=>applyField('h',parseFloat(e.target.value));
+$('#fW').onchange=e=>applyField('w',parseFloat(e.target.value)*10);
+$('#fH').onchange=e=>applyField('h',parseFloat(e.target.value)*10);
 $('#fR').onchange=e=>applyField('r',parseFloat(e.target.value));
-$('#fLv').onchange=e=>applyField('lv',parseFloat(e.target.value));
+$('#fLv').onchange=e=>applyField('lv',parseFloat(e.target.value)*10);
 function flipDoor(key){const pre=JSON.stringify(D),f=editableFurn();if(!f)return;f[key]=-(f[key]||1);commit(pre);}
 $('#bDoorFs').onclick=()=>flipDoor('fs');$('#bDoorHs').onclick=()=>flipDoor('hs');
 $('#bRot90').onclick=()=>rotBy(90);$('#bRotM').onclick=()=>rotBy(-15);$('#bRotP').onclick=()=>rotBy(15);
 $('#bFree').onclick=moveFree;$('#bFDup').onclick=dupFurn;$('#bFNote').onclick=editNote;$('#bFRm').onclick=delOrRmFurn;
 function lsGet(k){try{return localStorage.getItem(k);}catch(_){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(_){}}
-function panelsAsDrawers(){const m=lsGet('madori-panel');return m==='drawer'?true:m==='always'?false:innerWidth<=1200;}
-function applyPanelMode(){
-  const on=panelsAsDrawers();
-  document.body.classList.toggle('drawers',on);
-  if(!on){document.body.classList.remove('drawer');$('#sideL').classList.remove('open');$('#sideR').classList.remove('open');}
-  $('#bPanelMode').textContent=on?'左右パネル：必要なときだけ開く':'左右パネル：常に表示する';
-}
-$('#bPanelMode').onclick=()=>{lsSet('madori-panel',panelsAsDrawers()?'always':'drawer');applyPanelMode();};
+function applyPanelMode(){if(!document.querySelector('#sideL.open,#sideR.open'))document.body.classList.remove('drawer');}
 window.addEventListener('resize',applyPanelMode);
 function applyFold(){
   const f=lsGet('madori-fold')==='1';
@@ -2395,17 +2540,20 @@ function applyFold(){
   $('#bFold').textContent=f?'▼ メニュー':'▲ 折りたたむ';
 }
 $('#bFold').onclick=()=>{lsSet('madori-fold',lsGet('madori-fold')==='1'?'0':'1');applyFold();};
-applyPanelMode();applyFold();
+applyPanelMode();applyFold();if(innerWidth>1200)setDrawer("L");
 function setDrawer(which){
+  const b=document.body;
   $('#sideL').classList.toggle('open',which==='L');$('#sideR').classList.toggle('open',which==='R');
-  document.body.classList.toggle('drawer',!!which);
+  b.classList.toggle('drawer',!!which);b.classList.toggle('drawerL',which==='L');b.classList.toggle('drawerR',which==='R');
+  $('#bSide').innerHTML=which==='L'?'閉じる<br>◀':'屋内<br>▶';
+  $('#bSideR').innerHTML=which==='R'?'閉じる<br>▶':'屋外<br>◀';
 }
-$('#bSide').onclick=()=>setDrawer('L');
-$('#bSideR').onclick=()=>setDrawer('R');
-cv.addEventListener('pointerdown',()=>{if(document.body.classList.contains('drawer'))setDrawer(null);},true);
+$('#bSide').onclick=()=>setDrawer($('#sideL').classList.contains('open')?null:'L');
+$('#bSideR').onclick=()=>setDrawer($('#sideR').classList.contains('open')?null:'R');
+cv.addEventListener('pointerdown',()=>{if(innerWidth<=1200&&document.body.classList.contains('drawer'))setDrawer(null);},true);
 for(const id of['#sideL','#sideR'])$(id).addEventListener('click',e=>{
   if(!e.target.closest('button'))return;
-  setTimeout(()=>{if(ui.placing)setDrawer(null);},0);
+  setTimeout(()=>{if(ui.placing||ui.noteTool)setDrawer(null);},0);
 });
 $('#title').oninput=e=>{D.title=e.target.value;save();};
 (function(){
