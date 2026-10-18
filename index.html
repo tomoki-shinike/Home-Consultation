@@ -195,7 +195,7 @@ body.drawerR #bSideR{right:min(262px,80vw)}
         <button id="bPrint">印刷・画像保存</button>
         <button id="bTut">使い方を見る</button>
         <label id="lTutAuto"><input type="checkbox" id="chkTutAuto">起動時に使い方を毎回表示する</label>
-        <div id="verTag">版 v30（この表示が変わっていれば、新しい版が読み込まれています）</div>
+        <div id="verTag">版 v31（この表示が変わっていれば、新しい版が読み込まれています）</div>
       </div>
     </div>
   </header>
@@ -2716,7 +2716,19 @@ $('#title').oninput=e=>{D.title=e.target.value;save();};
 (function(){
   const fm=$('#fileMenu'),fb=$('#bFile');
   const close=()=>{fm.hidden=true;};
-  fb.onclick=e=>{e.stopPropagation();fm.hidden=!fm.hidden;};
+  function place(){
+    // 画面の端からはみ出さないよう、ボタンの下に出して、左右の位置を画面内に収める
+    fm.style.position='fixed';fm.style.right='auto';
+    const r=fb.getBoundingClientRect(),vw=document.documentElement.clientWidth,M=8;
+    fm.style.maxWidth=(vw-2*M)+'px';
+    fm.style.left=M+'px';fm.style.width='auto';
+    const w=Math.ceil(fm.getBoundingClientRect().width);fm.style.width=w+'px';
+    let l=r.right-w;l=Math.max(M,Math.min(l,vw-w-M));
+    fm.style.left=l+'px';fm.style.top=(r.bottom+6)+'px';
+    fm.style.maxHeight=(innerHeight-r.bottom-20)+'px';fm.style.overflowY='auto';
+  }
+  fb.onclick=e=>{e.stopPropagation();fm.hidden=!fm.hidden;if(!fm.hidden)place();};
+  window.addEventListener('resize',()=>{if(!fm.hidden)place();});
   fm.addEventListener('click',e=>{if(e.target.closest('#lTutAuto'))return;close();});
   document.addEventListener('pointerdown',e=>{if(!fm.hidden&&!e.target.closest('#fileWrap'))close();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
