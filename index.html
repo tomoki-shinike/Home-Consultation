@@ -58,6 +58,8 @@ canvas{display:block;touch-action:none;width:100%;height:100%}
 #fileWrap{position:relative}
 #fileMenu{position:absolute;right:0;top:calc(100% + 6px);z-index:30;background:#fff;border:1px solid #47526a;border-radius:10px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:4px;min-width:290px}
 #fileMenu[hidden]{display:none}
+#lTutAuto{display:flex;align-items:center;gap:10px;padding:11px 12px;min-height:44px;font-size:15px;color:#1f2933;cursor:pointer;border-top:1px solid #e3e7ee;margin-top:2px}
+#lTutAuto input{width:20px;height:20px}
 header #fileMenu button{white-space:nowrap;background:#fff;color:#1f2933;border:0;text-align:left;padding:11px 12px;min-height:44px;font-size:15px}
 header #fileMenu button:active{background:#e8eff9}
 #hint[hidden]{display:none}
@@ -92,6 +94,19 @@ header #fileMenu button:active{background:#e8eff9}
 .pi span{font-size:10.5px;color:var(--sub)}
 #gPlace{position:absolute;top:46px;left:10px;right:10px;z-index:4;justify-content:center;padding:6px 10px;border:2px solid #0f766e;border-radius:10px;background:#e6f6f3;box-shadow:0 2px 8px rgba(15,23,42,.2)}
 #gRail{display:none!important}
+#tut{position:fixed;inset:0;z-index:80;cursor:pointer}
+#tut[hidden]{display:none}
+#tutHole{position:absolute;border-radius:12px;border:3px solid #ffd43b;box-shadow:0 0 0 100vmax rgba(15,23,42,.62);pointer-events:none;animation:tutPulse 1.2s ease-in-out infinite}
+@keyframes tutPulse{50%{box-shadow:0 0 0 100vmax rgba(15,23,42,.62),0 0 0 6px rgba(255,212,59,.55)}}
+#tutBubble{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(430px,88vw);background:#fff;border-radius:16px;padding:18px 20px 14px;box-shadow:0 12px 40px rgba(0,0,0,.4);color:#1f2933;text-align:left}
+#tutTail{position:absolute;top:-12px;width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:13px solid #fff}
+#tutNo{font-size:12px;color:#667085;margin-bottom:4px}
+#tutTitle{font-size:19px;display:block;margin-bottom:8px;color:#1a56c4}
+#tutBubble .tutDemo{margin:2px 0 10px;border-radius:10px;overflow:hidden;border:1px solid #e3e8ef}
+#tutText{margin:0;font-size:15.5px;line-height:1.75}
+#tutFoot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+#tutHint{font-size:13px;color:#667085}
+#tutSkip{font-size:13px;padding:4px 12px;min-height:32px}
 #gMulti{position:absolute;top:46px;left:10px;right:10px;z-index:4;justify-content:center;padding:6px 10px;border:2px solid #e8590c;border-radius:10px;background:#fff4e5;box-shadow:0 2px 8px rgba(15,23,42,.2)}
 #gMulti b{font-size:13px;color:#c2410c}
 .side .grp{gap:6px}
@@ -174,6 +189,8 @@ body.drawerR #bSideR{right:min(262px,80vw)}
         <button id="bSave">保存（ファイルに書き出す）</button>
         <button id="bLoad">読込（ファイルを開く）</button>
         <button id="bPrint">印刷・画像保存</button>
+        <button id="bTut">使い方を見る</button>
+        <label id="lTutAuto"><input type="checkbox" id="chkTutAuto">起動時に使い方を毎回表示する</label>
       </div>
     </div>
   </header>
@@ -191,9 +208,9 @@ body.drawerR #bSideR{right:min(262px,80vw)}
     <div class="grp" id="gUndo">
       <button id="bUndo">↶ 元に戻す</button>
       <button id="bRedo">↷ やり直す</button>
+      <button id="bToolDel" title="選んだ家具・壁・注記・動線だけを削除します">🗑 削除</button>
       <span class="grp" id="gDraw">
           <button id="bDiag" title="ONにすると、なぞった線が斜めのまま壁になります">／ 斜めの壁：OFF</button>
-          <button id="bDelGuide" title="消したい壁を選んで削除します">🗑 壁を消す</button>
       </span>
       <button id="bClear" class="ghost" title="図面を全部消します（元に戻せます）">全部消す</button>
     </div>
@@ -256,7 +273,7 @@ body.drawerR #bSideR{right:min(262px,80vw)}
           <div class="note" style="margin-top:8px">役割を決めてから下の家具を押し、「おまかせ配置」を押すと、合う部屋に自動で置かれます。</div>
         </div>
         <div id="pFlow" hidden>
-          <div class="fname" style="color:#6d28d9">動線（人や車の通り道）</div>
+          <div class="fname" style="color:#6d28d9">動線（人の動き）</div>
           <div class="fields"><label>動線
             <select id="selFlowArrow"><option value="both">両方向 ↔</option><option value="end">片方向 →</option><option value="none">矢印なし</option></select></label></div>
           <div class="btns"><button id="bFlowRev">向きを逆にする</button></div>
@@ -337,6 +354,117 @@ body.drawerR #bSideR{right:min(262px,80vw)}
       <button id="pPng">画像（PNG）で保存</button>
       <button id="pGo" class="primary">印刷</button>
     </div>
+  </div>
+</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <g id="tutFingerShapes">
+    <rect x="-4.5" y="0" width="9" height="24" rx="4.5"/>
+    <rect x="4" y="12" width="8" height="18" rx="4"/>
+    <rect x="11" y="14" width="8" height="18" rx="4"/>
+    <rect x="18" y="17" width="7" height="15" rx="3.5"/>
+    <rect x="-4.5" y="18" width="29.5" height="22" rx="9"/>
+    <rect x="-16" y="21" width="9" height="17" rx="4.5" transform="rotate(-32 -11.5 29.5)"/>
+  </g>
+  <g id="tutFinger" transform="scale(.55)">
+    <use href="#tutFingerShapes" fill="#3b4252" stroke="#3b4252" stroke-width="4" stroke-linejoin="round"/>
+    <use href="#tutFingerShapes" fill="#fff"/>
+    <path d="M-4.5 6V3" stroke="none"/>
+  </g>
+</defs></svg>
+<div id="tut" hidden>
+  <div id="tutHole"></div>
+  <div id="tutBubble">
+    <div id="tutTail"></div>
+    <div id="tutNo"></div>
+    <b id="tutTitle"></b>
+    <div class="tutDemo" data-step="0" hidden>
+      <svg viewBox="0 0 260 150" width="100%" role="img" aria-label="四角い部屋をなぞって描く見本">
+        <rect width="260" height="150" rx="10" fill="#f6f8fb"/>
+        <g stroke="#e3e8ef" stroke-width="1"><path d="M0 30H260M0 60H260M0 90H260M0 120H260M40 0V150M80 0V150M120 0V150M160 0V150M200 0V150M240 0V150"/></g>
+        <rect x="40" y="28" width="170" height="92" fill="#1a6cf0" opacity="0">
+          <animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;.10;.10;0" keyTimes="0;.55;.62;.95;1"/>
+        </rect>
+        <path d="M40 28H210V120H40Z" pathLength="100" fill="none" stroke="#23272e" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="100">
+          <animate attributeName="stroke-dashoffset" dur="6s" repeatCount="indefinite" values="100;0;0;100" keyTimes="0;.55;.95;1"/>
+        </path>
+        <circle cx="40" cy="28" r="7" fill="#2f9e44"/>
+        <text x="40" y="17" font-size="12" font-weight="700" fill="#2f9e44" text-anchor="middle">始め</text>
+        <g opacity="0">
+          <use href="#tutFinger"/>
+          <animateMotion dur="6s" repeatCount="indefinite" path="M40 28H210V120H40Z" keyPoints="0;1;1" keyTimes="0;.55;1" calcMode="linear"/>
+          <animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;1;1;0;0" keyTimes="0;.03;.55;.62;1"/>
+        </g>
+        <text x="125" y="78" font-size="12" font-weight="700" fill="#1a56c4" text-anchor="middle" opacity="0">
+          始めに戻ると部屋ができます
+          <animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;.58;.66;.95;1"/>
+        </text>
+      </svg>
+    </div>
+    <div class="tutDemo" data-step="1" hidden>
+      <svg viewBox="0 0 260 150" width="100%" role="img" aria-label="家具をタップして選び、ドラッグで動かす見本">
+        <rect width="260" height="150" rx="10" fill="#f6f8fb"/>
+        <g stroke="#e3e8ef" stroke-width="1"><path d="M0 40H260M0 70H260M0 100H260M0 130H260M40 0V150M80 0V150M120 0V150M160 0V150M200 0V150M240 0V150"/></g>
+        <rect x="20" y="26" width="220" height="112" fill="none" stroke="#23272e" stroke-width="6" stroke-linejoin="round"/>
+        <g>
+          <animateTransform attributeName="transform" type="translate" dur="7s" repeatCount="indefinite" values="0 0;0 0;-126 -16;-126 -16;-126 -16" keyTimes="0;.3;.62;.9;1"/>
+          <rect x="160" y="52" width="44" height="64" rx="4" fill="#f1e4cf" stroke="#8a6d3b" stroke-width="2"/>
+          <rect x="167" y="57" width="30" height="14" rx="4" fill="#fff" stroke="#8a6d3b" stroke-width="1.5"/>
+          <text x="182" y="98" font-size="11" fill="#6b5a3a" text-anchor="middle">ベッド</text>
+          <rect x="155" y="47" width="54" height="74" rx="6" fill="none" stroke="#e8590c" stroke-width="3" stroke-dasharray="5 3" opacity="0">
+            <animate attributeName="opacity" dur="7s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;.16;.2;.9;1"/>
+          </rect>
+        </g>
+        <g opacity="0">
+          <g>
+            <animateTransform attributeName="transform" type="translate" dur="7s" repeatCount="indefinite" values="235 128;182 78;182 78;56 62;56 62" keyTimes="0;.14;.3;.62;1"/>
+            <use href="#tutFinger"/>
+          </g>
+          <animate attributeName="opacity" dur="7s" repeatCount="indefinite" values="0;1;1;1;0;0" keyTimes="0;.05;.62;.85;.9;1"/>
+        </g>
+        <text x="130" y="15" font-size="12" font-weight="700" fill="#c2410c" text-anchor="middle" opacity="0">タップして選びます
+          <animate attributeName="opacity" dur="7s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;.15;.2;.3;.31;1"/>
+        </text>
+        <text x="130" y="15" font-size="12" font-weight="700" fill="#1a56c4" text-anchor="middle" opacity="0">そのままドラッグで動かします
+          <animate attributeName="opacity" dur="7s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;.31;.36;.9;1"/>
+        </text>
+      </svg>
+    </div>
+    <div class="tutDemo" data-step="2" hidden>
+      <svg viewBox="0 0 260 150" width="100%" role="img" aria-label="動線を描き、吹き出しで補足を書き込む見本">
+        <rect width="260" height="150" rx="10" fill="#f6f8fb"/>
+        <g stroke="#e3e8ef" stroke-width="1"><path d="M0 40H260M0 70H260M0 100H260M0 130H260M40 0V150M80 0V150M120 0V150M160 0V150M200 0V150M240 0V150"/></g>
+        <rect x="20" y="26" width="220" height="112" fill="none" stroke="#23272e" stroke-width="6" stroke-linejoin="round"/>
+        <rect x="178" y="40" width="46" height="40" rx="4" fill="#eef1f5" stroke="#98a2b3" stroke-width="2"/>
+        <text x="201" y="64" font-size="11" fill="#475467" text-anchor="middle">トイレ</text>
+        <text x="46" y="126" font-size="11" fill="#475467" text-anchor="middle">玄関</text>
+        <path d="M46 112C46 78 96 92 128 70S168 62 174 62" pathLength="100" fill="none" stroke="#7c3aed" stroke-width="5" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="100">
+          <animate attributeName="stroke-dashoffset" dur="7s" repeatCount="indefinite" values="100;0;0;100" keyTimes="0;.42;.95;1"/>
+        </path>
+        <path d="M168 54L182 62L168 70Z" fill="#7c3aed" opacity="0">
+          <animate attributeName="opacity" dur="7s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;.41;.44;.95;1"/>
+        </path>
+        <g opacity="0">
+          <use href="#tutFinger"/>
+          <animateMotion dur="7s" repeatCount="indefinite" path="M46 112C46 78 96 92 128 70S168 62 174 62" keyPoints="0;1;1" keyTimes="0;.42;1" calcMode="linear"/>
+          <animate attributeName="opacity" dur="7s" repeatCount="indefinite" values="0;1;1;0;0" keyTimes="0;.03;.42;.5;1"/>
+        </g>
+        <g opacity="0">
+          <animate attributeName="opacity" dur="7s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;.55;.62;.95;1"/>
+          <path d="M98 88L90 104L112 104Z" fill="#fff" stroke="#475467" stroke-width="2" stroke-linejoin="round"/>
+          <rect x="62" y="104" width="96" height="26" rx="8" fill="#fff" stroke="#475467" stroke-width="2"/>
+          <path d="M92 104H110" stroke="#fff" stroke-width="3.5"/>
+          <text x="110" y="121" font-size="12" font-weight="700" fill="#344054" text-anchor="middle">夜間は暗い</text>
+        </g>
+        <text x="130" y="15" font-size="12" font-weight="700" fill="#6d28d9" text-anchor="middle" opacity="0">なぞって人の動き（動線）を描きます
+          <animate attributeName="opacity" dur="7s" repeatCount="indefinite" values="0;1;1;0;0" keyTimes="0;.04;.46;.5;1"/>
+        </text>
+        <text x="130" y="15" font-size="12" font-weight="700" fill="#344054" text-anchor="middle" opacity="0">吹き出しなどで補足も書き込めます
+          <animate attributeName="opacity" dur="7s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;.54;.6;.95;1"/>
+        </text>
+      </svg>
+    </div>
+    <p id="tutText"></p>
+    <div id="tutFoot"><span id="tutHint"></span><button id="tutSkip" type="button">閉じる</button></div>
   </div>
 </div>
 <div id="printArea"></div>
@@ -803,6 +931,8 @@ function recomputeRooms(){
   const segs=parts=>{const out=[];for(const[ln,f]of parts){const L=D[ln],nm=nodeMap(L);for(const w of L.walls){if(f&&!f(w))continue;const A=nm.get(w.a),B=nm.get(w.b);out.push({x1:A.x,y1:A.y,x2:B.x,y2:B.y});}}return out;};
   roomCache.before=buildRoomMap(segs([['base',null]]));
   roomCache.after=buildRoomMap(segs([['base',w=>!w.rm],['reform',null]]));
+  // 壁を消して部屋がなくなったあとに残った「役割の印」は捨てる（あとで同じ場所に描いた部屋に役割が付いてしまうため）
+  if(D.rooms&&D.rooms.length)D.rooms=D.rooms.filter(a=>roomCache.before.at(a.x,a.y)>=0||roomCache.after.at(a.x,a.y)>=0);
 }
 // 重なり判定・自動配置に使う「いまの状態」
 function buildCtx(kind){
@@ -1602,6 +1732,14 @@ function finishDiag(gg){
 }
 function finishStroke(gg){
   const el=editLayer();if(!el)return;
+  {
+    let len=0;for(let i=1;i<gg.pts.length;i++)len+=Math.hypot(gg.pts[i].x-gg.pts[i-1].x,gg.pts[i].y-gg.pts[i-1].y);
+    if(len*view.s<10){
+      const q=gg.pts[0],sx=q.x*view.s+view.ox,sy=q.y*view.s+view.oy,hit=hitWall(sx,sy);
+      if(hit&&hit.layer===el)tapSelect(hit,{x:sx,y:sy});else{ui.sel=null;updateUI();}
+      return;
+    }
+  }
   if(ui.diag){finishDiag(gg);return;}
   const res=strokeToPath(gg.pts);
   if(!res)return;
@@ -2266,7 +2404,8 @@ $('#bDiag').textContent=ui.diag?'／ 斜めの壁：ON':'／ 斜めの壁：OFF'
      $('#bFl2Del').hidden=!ok;$('#bFl2Rev').hidden=!ok;$('#bFl2Dup').hidden=!el;$('#bFl2Rm').hidden=!(inRef&&f.layer==='base');
      $('#selFl2Arrow').parentNode.hidden=!ok;$('#bFl2Rm').textContent=f.rm?'撤去を取り消す':'撤去にする';}}
   const showL=edit&&ui.tool!=='draw',showP=edit&&ui.tool==='select';
-  $('#ptL').textContent=ui.tool==='flow'?'✚ 詳細の追加':'🏠 屋内（家の中）';document.body.classList.toggle('tflow',ui.tool==='flow');
+  $('#ptL').textContent=ui.tool==='flow'?'✚ 詳細の追加':'🏠 屋内（家の中）';document.body.classList.toggle('tflow',ui.tool==='flow');refreshTabLabel();
+  {const bd=$('#bToolDel');bd.hidden=false;bd.disabled=!(s&&s.type!=='room');}
   $('#sideL').hidden=!showL;$('#sideR').hidden=!showP;
   $('#bSide').hidden=!showL;$('#bSideR').hidden=!showP;
   $('#secPal').hidden=!showP;$('#secUse').hidden=!showP;
@@ -2302,7 +2441,7 @@ $('#bDiag').textContent=ui.diag?'／ 斜めの壁：ON':'／ 斜めの壁：OFF'
   let h='';
   if(ui.mode==='compare')h='ピンチ・ホイールで拡大縮小、ドラッグで移動。「編集に戻る」で修正できます（修正後はもう一度「改修完了」で更新）。';
   else if(ui.tool==='draw'&&ui.diag)h='斜めの壁ONです：始点から終点まで、まっすぐなぞってください。壁の角に近づけると吸い付き、横・縦や45°などに近いときは自動でそろいます。「斜めの壁：ON」をもう一度押すとOFFに戻ります。';
-  else if(ui.tool==='draw')h='壁をざっくり指やマウスでなぞって離すと、まっすぐな線に自動で直ります。四角い部屋は始点に戻って閉じてください。家具・屋外のパネルは、「選ぶ・動かす」に切り替えると出ます。';
+  else if(ui.tool==='draw')h='壁をざっくり指やマウスでなぞって離すと、まっすぐな線に自動で直ります。四角い部屋は始点に戻って閉じてください。消したい壁は、タップして選び（1回目：部屋ごと／2回目：その線だけ）、上の「削除」で消せます。家具・屋外のパネルは、「選ぶ・動かす」に切り替えると出ます。';
   else if(ui.noteTool)h='置く場所を1回タップ（クリック）すると置かれます。置いたあと、左のパネルの入力欄で文字や数値(cm)を入力できます。やめるときは「やめる」かEscキーを押します。';
   else if(s&&s.type==='note')h='注釈を選択中：ドラッグで移動。寸法線は端の○、吹き出しは先端の○をドラッグして指す場所を合わせます。文字や数値は、左のパネルの入力欄で入力します。';
   else if(ui.placing)h='置きたい場所を1回タップ（クリック）すると置かれます。手すりは、壁に近づけると少し隙間をあけて寄ります。やめるときは「やめる」かEscキーを押します。部屋に自動で置きたいときは「おまかせ配置」を押します。';
@@ -2419,7 +2558,7 @@ function sheetCanvas(opt,mono){
   let nx=360;
   if(opt!=='before'){leg(nx,C.reform,false,mono?'太い線：改修で追加・変更':'青：改修で追加・変更',mono?15:7);nx=790;if(opt==='side'){leg(nx,C.rm,true,'赤の点線（左図）：撤去');nx=1210;}}
   if(D.furn.some(f=>f.t==='zone')){x.fillStyle='rgba(255,92,140,.35)';x.fillRect(nx,ly-14,60,28);x.strokeStyle='rgba(226,60,112,.95)';x.lineWidth=3;x.strokeRect(nx,ly-14,60,28);x.fillStyle='#475467';x.fillText('ピンク：課題の範囲',nx+74,ly);}
-  if(D.flows.length){const lx=nx+(D.furn.some(f=>f.t==='zone')?400:0);x.strokeStyle=FLOW_COL;x.lineWidth=7;x.beginPath();x.moveTo(lx,ly);x.lineTo(lx+60,ly);x.stroke();arrowHead(x,lx+60,ly,0,26,FLOW_COL);x.fillStyle='#475467';x.fillText('紫：動線（人・車の通り道）',lx+84,ly);}
+  if(D.flows.length){const lx=nx+(D.furn.some(f=>f.t==='zone')?400:0);x.strokeStyle=FLOW_COL;x.lineWidth=7;x.beginPath();x.moveTo(lx,ly);x.lineTo(lx+60,ly);x.stroke();arrowHead(x,lx+60,ly,0,26,FLOW_COL);x.fillStyle='#475467';x.fillText('紫：動線（人の動き）',lx+84,ly);}
   x.fillStyle='#98a2b3';x.textAlign='right';x.fillText('数字はcm／家具の大きさは目安',W-60,ly);
   if(mono){
     const im=x.getImageData(0,0,W,H),d=im.data;
@@ -2505,8 +2644,9 @@ $('#bPlaceEnd').onclick=endPlace;
 $('#bPlaceAuto').onclick=()=>{const k=ui.placing;if(k)addFurn(k);};
 $('#bPlaceRot').onclick=()=>{ui.placeRot=!ui.placeRot;draw();};
 $('#bDiag').onclick=()=>{ui.diag=!ui.diag;updateUI();toast(ui.diag?'斜めの壁：ON。始点から終点まで、まっすぐなぞると斜めの壁になります（壁の角には吸い付きます）':'斜めの壁：OFF。なぞった線は、横・縦のまっすぐな壁に直ります');};
-$('#bClear').onclick=clearAll;$('#bDelGuide').onclick=delGuide;
+$('#bClear').onclick=clearAll;
 $('#bMultiDel').onclick=delMulti;$('#bMultiClear').onclick=()=>{ui.sel=null;updateUI();draw();};
+$('#bToolDel').onclick=delSel;
 $('#bDel').onclick=delSel;$('#bDup').onclick=dupSel;$('#bRm').onclick=toggleRm;
 $('#bFit').onclick=()=>{ui.autoFit=true;fit();draw();};
 $('#bFlip').onclick=()=>{ui.toggleAfter=!ui.toggleAfter;updateUI();draw();};
@@ -2541,11 +2681,15 @@ function applyFold(){
 }
 $('#bFold').onclick=()=>{lsSet('madori-fold',lsGet('madori-fold')==='1'?'0':'1');applyFold();};
 applyPanelMode();applyFold();if(innerWidth>1200)setDrawer("L");
+function refreshTabLabel(){
+  const open=$('#sideL').classList.contains('open');
+  $('#bSide').innerHTML=open?'閉じる<br>◀':(ui.tool==='flow'?'追加':'屋内')+'<br>▶';
+}
 function setDrawer(which){
   const b=document.body;
   $('#sideL').classList.toggle('open',which==='L');$('#sideR').classList.toggle('open',which==='R');
   b.classList.toggle('drawer',!!which);b.classList.toggle('drawerL',which==='L');b.classList.toggle('drawerR',which==='R');
-  $('#bSide').innerHTML=which==='L'?'閉じる<br>◀':'屋内<br>▶';
+  refreshTabLabel();
   $('#bSideR').innerHTML=which==='R'?'閉じる<br>▶':'屋外<br>◀';
 }
 $('#bSide').onclick=()=>setDrawer($('#sideL').classList.contains('open')?null:'L');
@@ -2560,7 +2704,7 @@ $('#title').oninput=e=>{D.title=e.target.value;save();};
   const fm=$('#fileMenu'),fb=$('#bFile');
   const close=()=>{fm.hidden=true;};
   fb.onclick=e=>{e.stopPropagation();fm.hidden=!fm.hidden;};
-  fm.addEventListener('click',()=>close());
+  fm.addEventListener('click',e=>{if(e.target.closest('#lTutAuto'))return;close();});
   document.addEventListener('pointerdown',e=>{if(!fm.hidden&&!e.target.closest('#fileWrap'))close();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
 })();
@@ -2582,6 +2726,58 @@ window.addEventListener('keydown',e=>{
   else if(e.key==='Delete'||e.key==='Backspace'){delSel();}
   else if(e.key==='Escape'){ui.placing=null;ui.noteTool=null;ui.dimA=null;ui.ghost=null;ui.sel=null;updateUI();draw();}
 });
+
+
+// ---- はじめての人向けの使い方案内 ----
+(function(){
+  const STEPS=[
+    {tool:'draw',no:'① 壁を描く',title:'まず、家の骨組み（壁）を描きます',
+     text:'指やマウスで線をなぞって離すと、まっすぐな壁になります。四角い部屋は、下の見本のように、ぐるっと一周して始めの位置まで戻ると閉じます。まちがえた壁は、タップして選び、上の「削除」で消せます。'},
+    {tool:'select',no:'② 選ぶ・動かす',title:'次に、家具や手すり・扉を置きます',
+     text:'左の「屋内」パネルから置きたいものを選び、図面をタップすると置けます。置いたものは、ドラッグで動かせます。何もない所をなぞると範囲選択ができ、まとめて動かしたり消したりできます。'},
+    {tool:'flow',no:'③ 詳細の追加',title:'最後に、補足を書き込みます',
+     text:'人の動き（動線）を、指やマウスでなぞって描けます。文字・番号・寸法線・数値メモ・吹き出しは、左のパネルのボタンから追加します。'}
+  ];
+  let i=0,hadFold=false;
+  const T=$('#tut');
+  function place(){
+    const st=STEPS[i],btn=document.querySelector('#tools button[data-tool="'+st.tool+'"]');
+    const r=btn.getBoundingClientRect(),hole=$('#tutHole'),pad=5;
+    hole.style.left=(r.left-pad)+'px';hole.style.top=(r.top-pad)+'px';hole.style.width=(r.width+pad*2)+'px';hole.style.height=(r.height+pad*2)+'px';
+    const b=$('#tutBubble').getBoundingClientRect();
+    const cx=r.left+r.width/2-b.left;
+    $('#tutTail').style.left=Math.max(22,Math.min(b.width-46,cx-12))+'px';
+  }
+  function show(){
+    const st=STEPS[i];
+    $('#tutNo').textContent=(i+1)+' / '+STEPS.length;
+    $('#tutTitle').textContent=st.no+'：'+st.title;
+    $('#tutText').textContent=st.text;
+    document.querySelectorAll('#tutBubble .tutDemo').forEach(d=>{d.hidden=Number(d.dataset.step)!==i;});
+    $('#tutHint').textContent=i<STEPS.length-1?'画面をタップすると次へ進みます':'画面をタップすると始められます';
+    place();
+  }
+  function start(){
+    hadFold=document.body.classList.contains('fold');document.body.classList.remove('fold');
+    i=0;T.hidden=false;show();
+  }
+  function close(){
+    T.hidden=true;
+    if(hadFold)document.body.classList.add('fold');
+  }
+  T.addEventListener('click',e=>{
+    if(e.target.id==='tutSkip'){close();return;}
+    if(i<STEPS.length-1){i++;show();}else close();
+  });
+  window.addEventListener('resize',()=>{if(!T.hidden)place();});
+  window.addEventListener('keydown',e=>{if(!T.hidden&&e.key==='Escape')close();});
+  $('#bTut').onclick=start;
+  const chk=$('#chkTutAuto');
+  let auto=true;try{auto=localStorage.getItem('madori-tut-auto')!=='0';}catch(_){}
+  chk.checked=auto;
+  chk.onchange=()=>{try{localStorage.setItem('madori-tut-auto',chk.checked?'1':'0');}catch(_){}};
+  if(auto)setTimeout(start,350);
+})();
 
 // ---- 起動 ----
 (function init(){
