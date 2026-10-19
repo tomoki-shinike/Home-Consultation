@@ -58,6 +58,15 @@ select,input[type=number]{font:inherit;font-size:13px;padding:5px 6px;border:1px
 #stage{position:relative;flex:1;min-width:0;background:#fff;box-shadow:inset 0 0 0 1px #c9d3e3}
 canvas{display:block;touch-action:none;width:100%;height:100%}
 #fileWrap{position:relative}
+#modeWrap{position:relative}
+#tabs{position:absolute;top:calc(100% + 6px);left:0;z-index:30;display:flex;flex-direction:column;background:#fff;border:1px solid #47526a;border-radius:10px;padding:6px;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.35);min-width:150px}
+#tabs[hidden]{display:none}
+header #tabs button{white-space:nowrap;background:#fff;color:#1f2933;border:0;text-align:left;padding:10px 12px;min-height:44px;font-size:15px;border-radius:8px;margin:0}
+header #tabs button.on{background:#e3eeff;color:#1a56c4;font-weight:700}
+header #tabs button.dis{opacity:.45}
+.setRow.col{flex-direction:column;align-items:stretch;gap:4px}
+header #setRows #title{background:#fff;color:#1f2933;border:1px solid #d0d5dd;width:100%;min-width:0;font-size:15px;padding:9px 10px}
+header #setRows #title::placeholder{color:#98a2b3}
 #setRows{padding:4px 6px 8px;border-bottom:1px solid #e3e7ee;margin-bottom:2px}
 .setRow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:4px 6px;font-size:15px;color:#1f2933}
 .setRow select{font-size:15px;padding:7px 8px;max-width:190px}
@@ -146,7 +155,7 @@ body.tflow #bSide{background:#d9cbf3;border-color:#a98ee0;color:#4a2a86}
 .side #pNote,.side #flowEdit{padding:6px 8px}
 #tabStack{position:absolute;left:0;top:34%;z-index:5;display:flex;flex-direction:column;gap:0;border-radius:0 12px 12px 0;overflow:hidden;box-shadow:0 2px 10px rgba(15,23,42,.3)}
 body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
-.edgeTab{flex:none;display:flex;align-items:center;justify-content:center;min-width:0;padding:11px 7px;line-height:1.25;min-height:0;font-size:14px;font-weight:700;opacity:.85;border-radius:0;margin:0;box-shadow:none;text-align:center}
+.edgeTab{flex:none;display:flex;align-items:center;justify-content:center;min-width:0;padding:12px 11px;line-height:1.25;min-height:0;font-size:15px;font-weight:700;opacity:.85;border-radius:0;margin:0;box-shadow:none;text-align:center}
 .edgeTab.on{opacity:1;font-weight:800;box-shadow:inset 4px 0 0 rgba(15,23,42,.35)}
 .edgeTab+.edgeTab{border-top-width:0}
 #bSide{background:#f4d9a6;border-color:#d9b36a;color:#7a4b00}
@@ -199,14 +208,16 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
 <body>
 <div id="app">
   <header>
-    <input id="title" placeholder="案件名（例：A様邸 退院前訪問）">
-    <div class="seg" id="tabs">
-      <button data-mode="base">① 現状</button>
-      <button data-mode="reform">② 改修</button>
-      <button data-mode="compare" id="tabCompare">③ 比較</button>
-    </div>
     <div class="grp" id="gView">
       <button id="bFit">全体表示</button>
+    </div>
+    <div id="modeWrap">
+      <button id="bMode" aria-haspopup="true">① 現状 ▾</button>
+      <div class="seg" id="tabs" hidden>
+        <button data-mode="base">① 現状</button>
+        <button data-mode="reform">② 改修</button>
+        <button data-mode="compare" id="tabCompare">③ 比較</button>
+      </div>
     </div>
     <div class="grow"></div>
     <button id="b3d" class="primary" title="いまの図面を立体にして、回して見ます">🏠 3Dで見る</button>
@@ -214,6 +225,7 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
       <button id="bFile" class="primary" aria-haspopup="true">設定 ▾</button>
       <div id="fileMenu" hidden>
         <div id="setRows">
+          <label class="setRow col"><span>案件名</span><input id="title" placeholder="例：A様邸 退院前訪問"></label>
           <label class="setRow" title="壁や家具の位置を、選んだ間隔のます目にそろえます（家具は自由な位置にも置けます）"><span>ます目</span><select id="selStep">
           <option value="910">91cm（1マス）</option>
           <option value="455" selected>45.5cm（半マス）</option>
@@ -229,7 +241,7 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
         <button id="bPrint">印刷・画像保存</button>
         <button id="bTut">使い方を見る</button>
         <label id="lTutAuto"><input type="checkbox" id="chkTutAuto">起動時に使い方を毎回表示する</label>
-        <div id="verTag">版 v58（この表示が変わっていれば、新しい版が読み込まれています）</div>
+        <div id="verTag">版 v60（この表示が変わっていれば、新しい版が読み込まれています）</div>
       </div>
     </div>
   </header>
@@ -2571,6 +2583,7 @@ function updateUI(){
   const el=editLayer(),s=ui.sel,edit=ui.mode!=='compare';
   const sw=(s&&(s.type==='wall'||s.type==='figure'))?s:null,sf=(s&&s.type==='furn')?furnById(s.id):null,sfl=(s&&s.type==='flow')?D.flows.find(x=>x.id===s.id):null,snt=(s&&s.type==='note')?noteById(s.id):null;
   $$('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.mode===ui.mode));
+  {const ab=document.querySelector('#tabs button.on');if(ab)$('#bMode').textContent=ab.textContent+' ▾';}
   $('#tabCompare').classList.toggle('dis',!D.reformDone);
   $$('#tools button').forEach(b=>b.classList.toggle('on',b.dataset.tool===ui.tool));
   $$('#cmps button').forEach(b=>b.classList.toggle('on',b.dataset.cmp===ui.cmp));
@@ -2830,7 +2843,10 @@ function importJson(file){
 })();
 
 // ---- ボタン ----
-$$('#tabs button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+$$('#tabs button').forEach(b=>b.onclick=()=>{setMode(b.dataset.mode);$('#tabs').hidden=true;});
+$('#bMode').onclick=e=>{e.stopPropagation();$('#tabs').hidden=!$('#tabs').hidden;};
+document.addEventListener('pointerdown',e=>{if(!$('#tabs').hidden&&!e.target.closest('#modeWrap'))$('#tabs').hidden=true;});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#tabs').hidden=true;});
 $$('#tools button').forEach(b=>b.onclick=()=>{ui.tool=b.dataset.tool;ui.sel=null;ui.tpl=null;ui.placing=null;ui.noteTool=null;ui.dimA=null;ui.ghost=null;updateUI();draw();if(ui.tool==='select'||ui.tool==='flow')setDrawer('L');else if(ui.tool==='draw')setDrawer('L');});
 $$('#cmps button').forEach(b=>b.onclick=()=>{ui.cmp=b.dataset.cmp;fit();updateUI();draw();});
 $('#bUndo').onclick=undo;$('#bRedo').onclick=redo;
