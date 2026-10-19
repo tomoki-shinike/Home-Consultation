@@ -214,7 +214,7 @@ body.drawerR #bSideR{right:min(262px,80vw)}
         <button id="bPrint">印刷・画像保存</button>
         <button id="bTut">使い方を見る</button>
         <label id="lTutAuto"><input type="checkbox" id="chkTutAuto">起動時に使い方を毎回表示する</label>
-        <div id="verTag">版 v41（この表示が変わっていれば、新しい版が読み込まれています）</div>
+        <div id="verTag">版 v45（この表示が変わっていれば、新しい版が読み込まれています）</div>
       </div>
     </div>
   </header>
@@ -767,6 +767,7 @@ const CAT=[
   {k:'door2',n:'片引き戸',w:800,h:105,roles:[],rule:'center',noCol:true,door:'slide'},
   {k:'door0',n:'開口（扉なし）',w:900,h:105,roles:[],rule:'center',noCol:true,door:'open'},
   {k:'door3',n:'引き違い戸',w:1600,h:105,roles:[],rule:'center',noCol:true,door:'slide2'},
+  {k:'win',n:'窓',w:1600,h:105,roles:[],rule:'center',noCol:true,door:'window'},
   {k:'step',n:'段差',w:800,h:240,roles:[],rule:'center',noCol:true,stepmark:true}]},
  {g:'寝室',items:[
   {k:'bed',n:'ベッド',w:970,h:1950,roles:['寝室','和室'],rule:'back'},
@@ -1237,6 +1238,8 @@ function drawOpening(ctx,f,v,k,it){
     ctx.lineWidth=lwid*1.6;ln(-w/2,py,w/2,py);
     ctx.lineWidth=lwid*.8;ctx.setLineDash([5*k,4*k]);ln(-w/2+hs*w,py,w/2+hs*w,py);ctx.setLineDash(it.ghost?[6*k,4*k]:[]);
     arrowHead(ctx,hs*w*.5,py+fs*7*k,hs>0?0:PI,9*k,col);
+  }else if(d.door==='window'){
+    ctx.lineWidth=lwid*.8;const o=wh*.62;ln(-w/2,-o,w/2,-o);ln(-w/2,o,w/2,o);ctx.lineWidth=lwid*.6;ln(-w/2,0,w/2,0);
   }else if(d.door==='open'){
     ctx.lineWidth=lwid*.6;ctx.setLineDash([4*k,4*k]);ln(-w/2,0,w/2,0);ctx.setLineDash(it.ghost?[6*k,4*k]:[]);
   }else{
@@ -2123,7 +2126,7 @@ function snapAny(f,range,setSide){
 }
 // 戸の動く範囲（開き戸の扇形／引き戸の戸が滑って重なる範囲）
 function doorPoly(f){
-  const d=DEF[f.t];if(!d||!d.door||d.door==='slide2'||d.door==='open')return null;
+  const d=DEF[f.t];if(!d||!d.door||d.door==='slide2'||d.door==='open'||d.door==='window')return null;
   const a=f.r*PI/180,c=Math.cos(a),sn=Math.sin(a),fs=f.fs||1,hs=f.hs||1,w=f.w;
   const toW=(lx,ly)=>({x:f.x+lx*c-ly*sn,y:f.y+lx*sn+ly*c});
   if(d.door==='swing'){
@@ -2422,7 +2425,7 @@ function fillProps(){
     {const dd=DEF[f.t];$('#pDoorX').hidden=!(dd&&(dd.door||dd.stepmark));
      if(dd&&dd.door){
        $('#lvField').hidden=true;
-       $('#bDoorFs').hidden=dd.door==='slide2'||dd.door==='open';$('#bDoorHs').hidden=dd.door==='open';
+       $('#bDoorFs').hidden=dd.door==='slide2'||dd.door==='open'||dd.door==='window';$('#bDoorHs').hidden=dd.door==='open'||dd.door==='window';
        $('#bDoorFs').textContent=dd.door==='swing'?'開く向きを反転（内開き⇄外開き）':'戸のある側を反転';
        $('#bDoorHs').textContent=dd.door==='swing'?'吊元の左右を反転':(dd.door==='slide'?'滑る向きを反転':'前後の重なりを反転');
      }else if(dd&&dd.stepmark){
@@ -2890,7 +2893,7 @@ window.addEventListener('keydown',e=>{
 // ===== 3D表示（現状／改修後を立体にして、回して見る）=====
 (function(){
   const $v=id=>document.getElementById(id);
-  const WALL_H=2400, WALL_T=104, DOOR_H=2000;
+  const WALL_H=2400, WALL_T=104, DOOR_H=2000, WIN_SILL=900;
   // 家具ごとの仮の高さ（mm）。記載のない物は、一般的な大きさから仮に決めています
   const HT={bed:450,bedc:500,bedw:450,chest:1200,tvb:450,fri:1800,kit:850,sink:800,wash:900,walker:850,rollator:850,ptoilet:500,wc:900,kcar:1450,car:1450};
   const COL={bed:'#8fb3e0',bedc:'#8fb3e0',bedw:'#8fb3e0',chest:'#b98b5e',sofa:'#6d8fb5',tvb:'#4b5563',ltable:'#c9a273',dtable:'#c9a273',chair:'#b58a5a',
@@ -2931,6 +2934,12 @@ window.addEventListener('keydown',e=>{
       const lg=Math.min(45,w/6),ix=w/2-lg/2-15,iz=d/2-lg/2-15;
       for(const sx of[-1,1])for(const sz of[-1,1])box(par,lg,ht-top,lg,sx*ix,0,sz*iz,color,false);
     }
+    function cylX(par,rad,len,cx,cy,cz,color){
+      const m=new THREE.Mesh(new THREE.CylinderGeometry(rad,rad,len,14),mat(color));m.rotation.z=Math.PI/2;m.position.set(cx,cy,cz);par.add(m);return m;
+    }
+    function cylZ(par,rad,len,cx,cy,cz,color){
+      const m=new THREE.Mesh(new THREE.CylinderGeometry(rad,rad,len,14),mat(color));m.rotation.x=Math.PI/2;m.position.set(cx,cy,cz);par.add(m);return m;
+    }
     function wedge(par,w,h,rise,color){
       const a=[-w/2,0,h/2],b=[w/2,0,h/2],c=[-w/2,0,-h/2],d=[w/2,0,-h/2],e=[-w/2,rise,-h/2],f=[w/2,rise,-h/2];
       const tri=[a,b,f, a,f,e, c,d,f, c,f,e, a,e,c, b,d,f],pos=[];tri.forEach(p=>pos.push(...p));
@@ -2939,6 +2948,48 @@ window.addEventListener('keydown',e=>{
       par.add(new THREE.LineSegments(new THREE.EdgesGeometry(g,20),lineMat));
     }
 
+    // 横から見た輪郭（長さ方向 u と高さ y）を、幅 w の厚みに押し出して立体にする（車の車体用）
+    function profileSolid(par,pts,w,L,color,inset,y0){
+      const sh=new THREE.Shape();pts.forEach((p,i)=>{const x=p[0]*L,y=p[1];if(i)sh.lineTo(x,y);else sh.moveTo(x,y);});
+      const g=new THREE.ExtrudeGeometry(sh,{depth:w,bevelEnabled:false});
+      g.rotateY(Math.PI/2);g.translate(-w/2,y0||0,L/2); // 前（uが大きい側）が平面図の上（-z）になる
+      const m=new THREE.Mesh(g,mat(color));par.add(m);
+      par.add(new THREE.LineSegments(new THREE.EdgesGeometry(g,35),lineMat));
+      return m;
+    }
+    function carModel(par,w,L,o,f){
+      const body=tint(o.color,f),glass='#33475b';
+      // 車体（下の箱＋ボンネット・トランク）
+      const lower=[[0,300],[0,o.trunkY-60],[0.03,o.trunkY],[o.rearBeltU,o.beltY],[o.frontBeltU,o.beltY-20],[0.975,o.hoodY],[1,o.hoodY-100],[1,300]];
+      profileSolid(par,lower,w*.97,L,body);
+      // 窓まわり（ガラスは少し幅を広げて側面に見せる）
+      const glassPts=[[o.rearBeltU,o.beltY-5],[o.roofRearU,o.roofY-30],[o.roofFrontU,o.roofY-30],[o.frontBeltU,o.beltY-25]];
+      profileSolid(par,glassPts,w*.9,L,glass);
+      // 屋根
+      box(par,w*.84,45,(o.roofFrontU-o.roofRearU)*L,0,o.roofY-45,L/2-((o.roofFrontU+o.roofRearU)/2)*L,body);
+      // 柱（前後の窓の枠）
+      for(const sx of[-1,1]){
+        const a=[(o.frontBeltU*L-L/2)*-1,o.beltY-25],b=[(o.roofFrontU*L-L/2)*-1,o.roofY-30];
+        const dz=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dz,dy);
+        const m=box(par,50,len,50,sx*w*.44,0,0,body,false);m.position.set(sx*w*.44,(a[1]+b[1])/2,(a[0]+b[0])/2);m.rotation.x=Math.atan2(dz,dy)*1;
+      }
+      // ライト
+      for(const sx of[-1,1]){
+        box(par,w*.17,110,50,sx*(w/2-w*.14),o.hoodY-210,-L/2-4,'#fff3c4',false);
+        box(par,w*.14,110,50,sx*(w/2-w*.12),o.trunkY-130,L/2+4,'#d64545',false);
+        box(par,70,70,160,sx*(w/2+25),o.beltY-60,-L*.2,body,false); // ミラー
+      }
+      // 前後のバンパー（少し濃い色）
+      box(par,w*.95,130,70,0,320,-L/2+10,'#4a5360',false);
+      box(par,w*.95,130,70,0,320,L/2-10,'#4a5360',false);
+      // タイヤ（黒）とホイール
+      const R=o.wheelR;
+      for(const sx of[-1,1])for(const u of[.2,.78]){
+        const z=L/2-u*L,x=sx*(w/2-70);
+        const t=cyl(par,R,230,0,0,0,'#1d2127');t.rotation.z=Math.PI/2;t.position.set(x,R,z);
+        const h=cyl(par,R*.58,236,0,0,0,'#b7bec9');h.rotation.z=Math.PI/2;h.position.set(x,R,z);
+      }
+    }
     // ---- 床（部屋ごとに色）と地面 ----
     const map=roomCache[kind];
     const bb=boundsAll(),gx0=bb.minx-30000,gx1=bb.maxx+30000,gy0=bb.miny-30000,gy1=bb.maxy+30000;
@@ -2981,8 +3032,9 @@ window.addEventListener('keydown',e=>{
       else if(t==='stone')box(grp,w,30,h,0,0,0,'#9aa0a8');
       else if(t==='step')box(grp,w,f.lv||100,h,0,0,0,tint('#d9a441',f));
       else if(t==='rail'){
-        box(grp,w,40,40,0,760,0,tint('#8a94a6',f));
-        for(const sx of[-1,1])box(grp,30,760,30,sx*(w/2-20),0,0,tint('#8a94a6',f),false);
+        const rc=tint('#8a94a6',f);
+        cylX(grp,17,w,0,800,-30,rc);                                                   // 握る丸い棒
+        for(const sx of[-1,1]){const x=sx*(w/2-60);box(grp,30,30,70,x,785,-5,rc,false);box(grp,12,12,50,x,794,-45,rc,false);}  // 壁に留める金具
       }
       else if(t==='prail')cyl(grp,22,1400,0,0,0,tint('#8a94a6',f));
       else if(t==='istairs'){
@@ -2994,36 +3046,170 @@ window.addEventListener('keydown',e=>{
         for(let i=0;i<n;i++)box(grp,w,(i+1)*150,st,0,0,h/2-(i+.5)*st,tint('#c7ccd4',f));
       }
       else if(t==='slope')wedge(grp,w,h,Math.min(400,h/12),tint('#d6b36a',f));
-      else if(t==='car'||t==='kcar'){
-        box(grp,w,650,h,0,260,0,c);
-        box(grp,w*.88,520,h*.5,0,910,h*.04,tint('#c3cad6',f));
-        for(const sx of[-1,1])for(const sz of[-.32,.32])cyl(grp,260,w*.12,sx*(w/2-w*.06),0,sz*h,'#2f3540').rotation.z=Math.PI/2;
+      else if(t==='car')carModel(grp,w,h,{color:'#e9edf3',trunkY:900,beltY:950,hoodY:880,rearBeltU:.2,roofRearU:.36,roofFrontU:.64,frontBeltU:.76,roofY:1450,wheelR:330},f);
+      else if(t==='kcar')carModel(grp,w,h,{color:'#f3d96b',trunkY:900,beltY:980,hoodY:900,rearBeltU:.1,roofRearU:.13,roofFrontU:.62,frontBeltU:.8,roofY:1640,wheelR:300},f);
+      else if(t==='kit'){
+        const base=tint('#f0ece4',f),top=tint('#c9ced6',f);
+        box(grp,w,780,h,0,0,0,base);                          // 下の戸棚
+        box(grp,w+30,40,h+40,0,780,20,top);                   // 天板（少し前に出る）
+        box(grp,w*.3,70,h*.62,-w*.34,745,h*.02,'#7f8896',false); // シンクのくぼみ
+        cyl(grp,22,260,-w*.34,780,-h*.3,'#9aa3b0');            // 蛇口
+        box(grp,28,28,h*.18,-w*.34,1020,-h*.3+h*.09,'#9aa3b0',false);
+        for(const cx of[.2,.36]){cyl(grp,Math.min(h*.2,w*.045),14,w*cx,820,h*.02,'#2b2f36');cyl(grp,Math.min(h*.1,w*.022),18,w*cx,820,h*.02,'#555d69');} // コンロ
+        for(let i=1;i<6;i++)box(grp,8,640,6,-w/2+i*w/6,60,h/2+2,'#9a948a',false); // 戸棚の扉のすきま
+        for(let i=0;i<6;i++)box(grp,70,14,10,-w/2+(i+.5)*w/6,640,h/2+8,'#8a93a0',false); // 取っ手
       }
       else if(t==='ltable')table(grp,w,h,350,c);
       else if(t==='dtable')table(grp,w,h,720,c);
       else if(t==='chair'){table(grp,w,h,430,c,40);box(grp,w,380,40,0,430,-h/2+20,c);}
       else if(t==='sofa'){
-        box(grp,w,420,h,0,0,0,c);
-        box(grp,w,760,h*.28,0,0,-h/2+h*.14,c);
-        for(const sx of[-1,1])box(grp,w*.08,600,h,sx*(w/2-w*.04),0,0,c);
+        const fab=tint('#6d8fb5',f),fab2=tint('#7ea0c6',f),dark=tint('#55708f',f);
+        const armW=w*.09;
+        for(const sx of[-1,1])box(grp,70,70,70,sx*(w/2-90),0,h/2-90,'#3b3f46',false); // 脚
+        box(grp,w-armW*2,170,h*.8,0,70,h*.1,dark);                     // 座面の土台
+        const n=3,cw=(w-armW*2)/n;
+        for(let i=0;i<n;i++)box(grp,cw-14,130,h*.7,-(w-armW*2)/2+cw*(i+.5),240,h*.14,fab2); // 座面クッション
+        box(grp,w-armW*2,420,h*.2,0,170,-h/2+h*.1,fab);                // 背もたれ
+        for(let i=0;i<n;i++)box(grp,cw-30,260,h*.14,-(w-armW*2)/2+cw*(i+.5),380,-h/2+h*.22,fab2); // 背クッション
+        for(const sx of[-1,1])box(grp,armW,580,h,sx*(w/2-armW/2),70,0,fab);  // 肘掛け
       }
       else if(t==='bed'||t==='bedc'||t==='bedw'){
-        box(grp,w,hh,h,0,0,0,c);
-        box(grp,w*.8,110,h*.16,0,hh,-h/2+h*.12,'#f8fafc');
-        box(grp,w,380,40,0,0,-h/2+20,tint('#8b6b4a',f),false);
+        const care=t==='bedc',wide=t==='bedw';
+        const wood=tint(care?'#c9ced6':'#8b6b4a',f),sheet=tint('#f6f8fb',f),duvet=tint(care?'#8fc4a8':'#8fb3e0',f);
+        box(grp,w,200,h,0,0,0,tint('#4b5260',f));                                  // 脚まわり
+        box(grp,w,170,h,0,200,0,wood);                                             // ベッドの枠
+        box(grp,w-60,150,h-80,0,370,0,sheet);                                      // マットレス
+        box(grp,w,care?600:800,50,0,0,-h/2+25,wood);                               // 頭側の板
+        box(grp,w,care?420:300,50,0,0,h/2-25,wood);                                // 足側の板
+        const np=wide?2:1;
+        for(let i=0;i<np;i++)box(grp,(w-120)/np-30,110,h*.17,-(w-120)/2+(w-120)/np*(i+.5)+60,520,-h/2+h*.14,'#ffffff'); // 枕
+        box(grp,w-40,70,h*.62,0,520,h*.17,duvet);                                  // 掛け布団
+        box(grp,w-20,30,h*.12,0,520,-h*.14,duvet,false);                           // 折り返し
+        if(care)for(const sx of[-1,1])for(const z of[-.18,.22])box(grp,30,330,h*.28,sx*(w/2+10),520,h*z,tint('#9aa3b0',f)); // 柵
       }
-      else if(t==='bath'){box(grp,w,hh,h,0,0,0,c);box(grp,w*.86,6,h*.7,0,hh,0,'#9cc9e8',false);}
-      else if(t==='sink'){box(grp,w,hh,h,0,0,0,c);box(grp,w*.5,6,h*.5,0,hh,h*.05,'#7f8c9c',false);}
-      else if(t==='wash'){box(grp,w,hh,h,0,0,0,c);cyl(grp,Math.min(w,h)*.3,6,0,hh,h*.04,'#7f8c9c');}
+      else if(t==='bath'){
+        const shell=tint('#eef2f6',f),th=90;
+        box(grp,w,hh,th,0,0,-h/2+th/2,shell);box(grp,w,hh,th,0,0,h/2-th/2,shell);
+        box(grp,th,hh,h-2*th,-w/2+th/2,0,0,shell);box(grp,th,hh,h-2*th,w/2-th/2,0,0,shell);
+        box(grp,w-2*th,60,h-2*th,0,0,0,tint('#dfe7ee',f));                          // 底
+        box(grp,w-2*th-10,6,h-2*th-10,0,hh*.7,0,'#9cc9e8',false);                   // お湯の面
+        cyl(grp,26,260,w/2-th/2-60,hh,0,'#9aa3b0');                                 // 水栓
+      }
       else if(t==='toi'){
-        box(grp,w,380,h*.72,0,0,h*.14,c);
-        box(grp,w,800,h*.28,0,0,-h/2+h*.14,c);
+        const por=tint('#fbfcfd',f);
+        box(grp,w*.8,800,h*.22,0,0,-h/2+h*.11+10,por);                              // タンク
+        cyl(grp,26,50,w*.2,800,-h/2+h*.11,'#9aa3b0');                               // 洗浄ボタン
+        const b0=cyl(grp,w*.46,360,0,0,h*.1,por);b0.scale.z=(h*.5)/(w*.46);          // 便器の台
+        const b1=cyl(grp,w*.5,50,0,360,h*.1,tint('#eef1f5',f));b1.scale.z=(h*.52)/(w*.5); // 便座
+        const b2=cyl(grp,w*.34,6,0,410,h*.12,'#6f93b3');b2.scale.z=(h*.34)/(w*.34);       // 水たまり
+        box(grp,w*.7,40,h*.2,0,360,-h/2+h*.3,por,false);                            // ふたのつけ根
       }
-      else if(t==='walker'||t==='rollator')table(grp,w,h,hh,c,30);
-      else if(t==='wc'){box(grp,w,450,h*.8,0,250,h*.1,c);box(grp,w,450,40,0,450,-h/2+60,c);}
+      else if(t==='sink'){
+        const cab=tint('#f3f1ec',f),top=tint('#e3e7ee',f);
+        box(grp,w,690,h,0,0,0,cab);box(grp,w+20,40,h+20,0,690,10,top);                 // 洗面台の下の戸棚と天板
+        const bs=cyl(grp,w*.3,8,0,730,h*.06,'#8e99a8');bs.scale.z=(h*.3)/(w*.3);     // 洗面ボウル
+        cyl(grp,20,150,0,730,-h*.22,'#9aa3b0');box(grp,24,24,110,0,860,-h*.22+50,'#9aa3b0',false); // 蛇口
+        box(grp,w*.88,800,22,0,1000,-h/2+12,'#cfe4f2');                                // 鏡
+        box(grp,6,600,6,0,60,h/2+2,'#9a948a',false);                                   // 扉のすきま
+      }
+      else if(t==='wash'){
+        const body=tint('#f6f7f9',f);
+        box(grp,w,900,h,0,0,0,body);
+        box(grp,w*.9,70,h*.2,0,830,h*.3,'#39424e',false);                              // 操作パネル
+        const dr=cyl(grp,w*.36,30,0,420,h/2+4,'#c7ced8');dr.rotation.x=Math.PI/2;       // ドアの縁
+        const gl=cyl(grp,w*.29,34,0,420,h/2+8,'#3a4a5c');gl.rotation.x=Math.PI/2;       // ドアのガラス
+        for(const sx of[-1,1])box(grp,40,40,40,sx*(w/2-50),-10,h/2-50,'#555d69',false);
+      }
+      else if(t==='ptoilet'){
+        const fr=tint('#aab2bf',f),seat=tint('#f1e3c9',f);
+        for(const sx of[-1,1])for(const sz of[-1,1])box(grp,30,430,30,sx*(w/2-30),0,sz*(h/2-30),fr,false); // 脚
+        box(grp,w*.86,40,h*.86,0,400,0,tint('#6c7584',f));                                  // バケツ置き場
+        const st=cyl(grp,w*.42,40,0,430,h*.04,seat);st.scale.z=(h*.46)/(w*.42);             // 便座
+        const hole=cyl(grp,w*.24,44,0,432,h*.06,'#5a6270');hole.scale.z=(h*.28)/(w*.24);
+        box(grp,w*.86,380,40,0,470,-h/2+30,seat);                                           // 背もたれ
+        for(const sx of[-1,1])box(grp,40,40,h*.8,sx*(w/2-20),640,0,fr);                      // ひじ掛け
+        for(const sx of[-1,1])box(grp,30,200,30,sx*(w/2-20),440,-h/2+40,fr,false);
+      }
+      else if(t==='chest'){
+        const wd=tint('#b98b5e',f);
+        box(grp,w,1200,h,0,0,0,wd);
+        for(let i=1;i<5;i++)box(grp,w-20,8,6,0,i*240,h/2+2,'#7a5a3a',false);             // 引き出しのすきま
+        for(let i=0;i<5;i++)box(grp,90,16,16,0,i*240+130,h/2+8,'#5b4630',false);          // 取っ手
+      }
+      else if(t==='tvb'){
+        const wd=tint('#4b5563',f);
+        box(grp,w,450,h,0,0,0,wd);
+        box(grp,6,380,6,0,40,h/2+2,'#2b3038',false);box(grp,6,380,6,-w/4,40,h/2+2,'#2b3038',false);box(grp,6,380,6,w/4,40,h/2+2,'#2b3038',false);
+        for(const sx of[-1,1])box(grp,60,14,14,sx*w*.12,260,h/2+8,'#9aa3b0',false);
+      }
+      else if(t==='fri'){
+        const wh=tint('#f3f4f6',f);
+        box(grp,w,1800,h,0,0,0,wh);
+        box(grp,w-20,8,6,0,1180,h/2+2,'#9aa3b0',false);                                  // 冷蔵室と冷凍室のすきま
+        box(grp,24,300,24,w/2-70,1250,h/2+14,'#8a93a0',false);box(grp,24,260,24,w/2-70,760,h/2+14,'#8a93a0',false);
+      }
+      else if(t==='wc'){
+        const fr=tint('#55627a',f);
+        for(const sx of[-1,1]){
+          const w1=cyl(grp,300,40,0,0,0,'#1d2127');w1.rotation.z=Math.PI/2;w1.position.set(sx*(w/2-20),300,-h*.12);        // 大きな後輪
+          const w2=cyl(grp,95,36,0,0,0,'#1d2127');w2.rotation.z=Math.PI/2;w2.position.set(sx*(w/2-80),95,h*.38);          // 前の小さな車輪
+          box(grp,30,30,h*.55,sx*(w/2-70),620,-h*.05,fr,false);                                                          // ひじ掛け
+          box(grp,30,330,30,sx*(w/2-70),300,h*.2,fr,false);
+          box(grp,30,30,30,sx*(w/2-70),980,-h/2+10,'#1d2127',false);                                                    // 押す取っ手
+        }
+        box(grp,w*.76,40,h*.42,0,430,-h*.05,'#2f3744');                                                                  // 座面
+        box(grp,w*.76,420,30,0,470,-h*.28,'#2f3744');                                                                    // 背もたれ
+        box(grp,w*.5,30,h*.14,0,150,h*.44,fr);                                                                           // 足置き
+      }
+      else if(t==='walker'){
+        const fr=c,iw=w/2-25,id=h/2-25;
+        for(const sx of[-1,1])for(const sz of[-1,1])cyl(grp,13,hh-40,sx*iw,0,sz*id,fr);  // 4本の脚
+        for(const sx of[-1,1]){cylZ(grp,12,h-50,sx*iw,hh-30,0,fr);}                      // 左右の横枠
+        cylX(grp,12,w-50,0,hh-30,-id,fr);                                                // 手前の握り棒
+        for(const sx of[-1,1])cyl(grp,17,110,sx*iw,hh-10,-id,'#2f3744');                  // グリップ
+        cylX(grp,10,w-50,0,300,id,fr);                                                    // 前の補強棒
+      }
+      else if(t==='rollator'){
+        const fr=c,iw=w/2-30,id=h/2-30;
+        for(const sx of[-1,1])for(const sz of[-1,1]){
+          const m=cylX(grp,85,26,sx*(w/2-13),85,sz*id,'#2f3744');                         // 車輪
+        }
+        for(const sx of[-1,1]){cyl(grp,13,hh-80,sx*iw,100,-id,fr);cyl(grp,13,480,sx*iw,100,id,fr);cylZ(grp,12,h-60,sx*iw,560,0,fr);
+          cyl(grp,17,110,sx*iw,hh-10,-id,'#2f3744');}
+        cylX(grp,12,w-60,0,hh-30,-id,fr);                                                // 握り棒
+        box(grp,w-80,35,Math.min(h*.45,260),0,540,0,'#4b5563');                          // 座面
+        box(grp,w-120,160,Math.min(h*.3,200),0,150,id-60,'#8a93a0',false);                // かご
+      }
       else box(grp,w,hh,h,0,0,0,c);
     }
 
+    // ---- 戸（開き戸は90度ひらいた形、引き戸はひらいた位置の板）----
+    for(const d of doors){
+      const def=DEF[d.t],grp=new THREE.Group();grp.position.set(d.x,0,d.y);grp.rotation.y=-(d.r||0)*Math.PI/180;root.add(grp);
+      const dh=Math.min(DOOR_H,wallH),w=d.w,fs=d.fs||1,hs=d.hs||1,leaf=tint('#c9a47a',d),frame=tint('#a98558',d);
+      if(def.door==='open')continue;
+      if(def.door==='window'){
+        const y0=Math.min(WIN_SILL,wallH-100),y1=Math.min(DOOR_H,wallH),wh2=y1-y0;if(wh2<100)continue;
+        const fr=tint('#e8ebf0',d);
+        for(const sx of[-1,1])box(grp,40,wh2,WALL_T+20,sx*(w/2-20),y0,0,fr,false);
+        box(grp,w,40,WALL_T+20,0,y0,0,fr,false);box(grp,w,40,WALL_T+20,0,y1-40,0,fr,false);
+        box(grp,30,wh2-80,WALL_T+10,0,y0+40,0,fr,false);
+        const gl=box(grp,w-80,wh2-80,10,0,y0+40,0,'#9fd0f0',false);
+        if(gl&&gl.material){gl.material.transparent=true;gl.material.opacity=.4;}
+        continue;
+      }
+      for(const sx of[-1,1])box(grp,40,dh,WALL_T+20,sx*(w/2-20),0,0,frame,false); // 枠
+      if(def.door==='swing'){
+        box(grp,40,dh-30,w-40,hs*(w/2-20),0,fs*(w/2),leaf);                       // ひらいた扉
+        cyl(grp,22,60,hs*(w/2-20)-hs*30,dh*.5,fs*(w-80),'#8a93a0');                    // 取っ手
+      }else if(def.door==='slide'){
+        box(grp,w,dh-30,36,hs*w/2,0,fs*(WALL_T/2+30),leaf);
+        box(grp,70,20,60,hs*w/2,dh*.5,fs*(WALL_T/2+66),'#8a93a0',false);
+      }else if(def.door==='slide2'){
+        box(grp,w/2,dh-30,34,-w/4,0,fs*(WALL_T/2+28),leaf);
+        box(grp,w/2,dh-30,34,w/4,0,-fs*(WALL_T/2+28),tint('#d5b690',d));
+      }
+    }
     // ---- 壁（ドアや開口のところは穴をあける）----
     const bw=wallsOf('base'),rw=wallsOf('reform');
     const ents=(kind==='before'?bw.map(e=>({e,rf:false})):bw.filter(e=>!e.w.rm).map(e=>({e,rf:false})).concat(rw.map(e=>({e,rf:true}))));
@@ -3035,8 +3221,7 @@ window.addEventListener('keydown',e=>{
       for(const d of doors){
         const px=d.x-A.x,py=d.y-A.y,t=px*ux+py*uy,off=Math.abs(-px*uy+py*ux);
         if(off<260&&t>-100&&t<L+100){
-          const dw=(d.r%180===0)?d.w:d.w; // 開口の幅
-          holes.push([t-dw/2,t+dw/2]);
+          holes.push([t-d.w/2,t+d.w/2,DEF[d.t].door==='window']);
         }
       }
       holes.sort((p,q)=>p[0]-q[0]);
@@ -3050,9 +3235,13 @@ window.addEventListener('keydown',e=>{
         const ln=root.children[root.children.length-1];ln.position.copy(m.position);ln.rotation.y=ang;
       };
       let cur=-ext;
-      for(const[h0,h1]of holes){
+      for(const[h0,h1,isWin]of holes){
         piece(cur,Math.max(cur,h0),0,wallH);
-        if(h1>h0&&wallH>DOOR_H)piece(Math.max(h0,-ext),Math.min(h1,L+ext),DOOR_H,wallH); // 開口の上の壁
+        if(isWin){
+          const y0=Math.min(WIN_SILL,wallH-100),y1=Math.min(DOOR_H,wallH);
+          piece(Math.max(h0,-ext,cur),Math.min(h1,L+ext),0,y0);                 // 窓の下の壁
+          if(wallH>y1)piece(Math.max(h0,-ext,cur),Math.min(h1,L+ext),y1,wallH); // 窓の上の壁
+        }else if(h1>h0&&wallH>DOOR_H)piece(Math.max(h0,-ext),Math.min(h1,L+ext),DOOR_H,wallH); // 開口の上の壁
         cur=Math.max(cur,h1);
       }
       piece(cur,L+ext,0,wallH);
