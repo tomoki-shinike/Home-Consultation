@@ -195,7 +195,7 @@ body.drawerR #bSideR{right:min(262px,80vw)}
         <button id="bPrint">印刷・画像保存</button>
         <button id="bTut">使い方を見る</button>
         <label id="lTutAuto"><input type="checkbox" id="chkTutAuto">起動時に使い方を毎回表示する</label>
-        <div id="verTag">版 v33（この表示が変わっていれば、新しい版が読み込まれています）</div>
+        <div id="verTag">版 v34（この表示が変わっていれば、新しい版が読み込まれています）</div>
       </div>
     </div>
   </header>
@@ -757,7 +757,7 @@ const CATO=[
   {k:'road',n:'道路',w:6000,h:4000,roles:[],rule:'center',out:true,area:true}]},
  {g:'段差',items:[
   {k:'slope',n:'スロープ',w:1200,h:3600,roles:[],rule:'center',out:true},
-  {k:'stairs',n:'屋外の階段',w:1200,h:1000,roles:[],rule:'center',out:true}]}
+  {k:'stairs',n:'屋外の階段',w:1200,h:1800,roles:[],rule:'center',out:true}]}
 ];
 const DEF={};CAT.concat(CATO).forEach(gp=>gp.items.forEach(it=>{DEF[it.k]=it;}));
 const isArea=t=>!!(DEF[t]&&(DEF[t].zone||DEF[t].area));
@@ -1087,7 +1087,7 @@ function drawFurn(ctx,f,v,k,it){
   else if(it.pass==='out'){ctx.fillStyle=stroke;ctx.lineWidth=Math.max(3,3.2*k);ctx.fill();ctx.stroke();} // 手すりの外ふち（つながった手すりを、ひとつの形に見せる）
   else{
   if(!zone&&!it.ghost&&t!=='rail'){ctx.save();ctx.fillStyle='#fff';ctx.fill();ctx.restore();} // 家具の下は白にして、部屋の色を隠す
-  if(t==='istairs'){ctx.fill();ctx.beginPath();ctx.moveTo(-w/2,-h/2);ctx.lineTo(-w/2,h/2);ctx.moveTo(w/2,-h/2);ctx.lineTo(w/2,h/2);ctx.stroke();} // 階段は左右の壁の線だけ（上下は閉じない）
+  if(t==='istairs'||t==='stairs'){ctx.fill();ctx.beginPath();ctx.moveTo(-w/2,-h/2);ctx.lineTo(-w/2,h/2);ctx.moveTo(w/2,-h/2);ctx.lineTo(w/2,h/2);ctx.stroke();} // 階段は左右の壁の線だけ（上下は閉じない）
   else{ctx.fill();ctx.stroke();}
   }
   ctx.setLineDash([]);
@@ -1120,7 +1120,7 @@ function drawFurn(ctx,f,v,k,it){
     else if(t==='istairs'){const n=10;for(let i=1;i<n;i++){const y=-h/2+h*i/n;ln(-w/2,y,w/2,y);}ctx.beginPath();ctx.moveTo(0,h*.42);ctx.lineTo(0,-h*.42);ctx.moveTo(-w*.16,-h*.25);ctx.lineTo(0,-h*.42);ctx.lineTo(w*.16,-h*.25);ctx.stroke();}
     else if(t==='ptoilet'){ctx.beginPath();rr(ctx,-w*.4,-h/2+h*.06,w*.8,h*.2,3*k);ctx.stroke();ctx.beginPath();ctx.ellipse(0,h*.1,w*.3,h*.27,0,0,PI*2);ctx.stroke();ctx.beginPath();ctx.ellipse(0,h*.1,w*.17,h*.15,0,0,PI*2);ctx.stroke();}
     else if(t==='rollator'){const r=Math.min(w,h)*.09;for(const[sx,sy]of[[-1,-1],[1,-1],[1,1],[-1,1]]){ctx.beginPath();ctx.arc(sx*w*.42,sy*h*.42,r,0,PI*2);ctx.stroke();}ln(-w*.42,-h*.42,w*.42,-h*.42);ln(-w*.42,h*.42,w*.42,h*.42);ln(-w*.42,-h*.42,-w*.42,h*.42);ln(w*.42,-h*.42,w*.42,h*.42);ln(-w*.36,h*.18,w*.36,h*.18);}
-    else if(t==='stairs'){const n=4;for(let i=1;i<n;i++){const y=-h/2+h*i/n;ln(-w/2,y,w/2,y);}}
+    else if(t==='stairs'){const n=Math.max(3,Math.round(h/v.s/250));for(let i=1;i<n;i++){const y=-h/2+h*i/n;ln(-w/2,y,w/2,y);}ctx.beginPath();ctx.moveTo(0,h*.42);ctx.lineTo(0,-h*.42);ctx.moveTo(-w*.16,-h*.25);ctx.lineTo(0,-h*.42);ctx.lineTo(w*.16,-h*.25);ctx.stroke();}
     else if(t==='walker'){for(const[sx,sy]of[[-1,-1],[1,-1],[1,1],[-1,1]]){ctx.beginPath();ctx.arc(sx*w*.38,sy*h*.38,Math.min(w,h)*.07,0,PI*2);ctx.stroke();}}
   }
   ctx.restore();
