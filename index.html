@@ -6,7 +6,7 @@
 <title>住宅環境ツール</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
 <meta name="theme-color" content="#1d232e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -249,7 +249,7 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
         <button id="bPrint">印刷・画像保存</button>
         <button id="bTut">使い方を見る</button>
         <label id="lTutAuto"><input type="checkbox" id="chkTutAuto">起動時に使い方を毎回表示する</label>
-        <div id="verTag">版 v66（この表示が変わっていれば、新しい版が読み込まれています）</div>
+        <div id="verTag">版 v68（この表示が変わっていれば、新しい版が読み込まれています）</div>
       </div>
     </div>
   </header>
@@ -259,7 +259,7 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
     <div class="grp" id="gTool">
       <div class="seg" id="tools">
         <button data-tool="draw">✏ 壁を描く</button>
-        <button data-tool="select">☝ 選ぶ・動かす</button>
+        <button data-tool="select">☝ 内容を編集</button>
         <button data-tool="flow" id="tFlow">✚ 詳細の追加</button>
       </div>
     </div>
@@ -1912,7 +1912,7 @@ function dupFlow(){
 }
 function flowArrowSet(v){const f=curFlow();if(!f||f.layer!==editLayer()){updateUI();return;}const pre=JSON.stringify(D);f.arrow=v;commit(pre);}
 function flowReverse(){const f=curFlow();if(!f||f.layer!==editLayer())return;const pre=JSON.stringify(D);f.pts.reverse();commit(pre);}
-// ---- 選ぶ・動かす ----
+// ---- 内容を編集 ----
 function tapSelect(h,p){
   if(!h){
     const m=mapNow(),w=s2w(p);
@@ -2848,7 +2848,7 @@ $('#bDiag').textContent=ui.diag?'／ 斜めの壁：ON':'／ 斜めの壁：OFF'
   let h='';
   if(ui.mode==='compare')h='ピンチ・ホイールで拡大縮小、ドラッグで移動。「編集に戻る」で修正できます（修正後はもう一度「改修完了」で更新）。';
   else if(ui.tool==='draw'&&ui.diag)h='斜めの壁ONです：始点から終点まで、まっすぐなぞってください。壁の角に近づけると吸い付き、横・縦や45°などに近いときは自動でそろいます。「斜めの壁：ON」をもう一度押すとOFFに戻ります。';
-  else if(ui.tool==='draw')h='壁をざっくり指やマウスでなぞって離すと、まっすぐな線に自動で直ります。四角い部屋は始点に戻って閉じてください。消したい壁は、タップして選び（1回目：部屋ごと／2回目：その線だけ）、上の「削除」で消せます。家具・屋外のパネルは、「選ぶ・動かす」に切り替えると出ます。';
+  else if(ui.tool==='draw')h='壁をざっくり指やマウスでなぞって離すと、まっすぐな線に自動で直ります。四角い部屋は始点に戻って閉じてください。消したい壁は、タップして選び（1回目：部屋ごと／2回目：その線だけ）、上の「削除」で消せます。家具・屋外のパネルは、「内容を編集」に切り替えると出ます。';
   else if(ui.noteTool)h='置く場所を1回タップ（クリック）すると置かれます。置いたあと、左端のパネルの入力欄で文字や数値(cm)を入力できます。やめるときは「やめる」かEscキーを押します。';
   else if(s&&s.type==='note')h='注釈を選択中：ドラッグで移動。寸法線は端の○、吹き出しは先端の○をドラッグして指す場所を合わせます。文字や数値は、左端のパネルの入力欄で入力します。';
   else if(ui.placing)h='置きたい場所を1回タップ（クリック）すると置かれます。手すりは、壁に近づけると少し隙間をあけて寄ります。やめるときは「やめる」かEscキーを押します。部屋に自動で置きたいときは「おまかせ配置」を押します。';
@@ -3064,7 +3064,7 @@ $$('#tabs button').forEach(b=>b.onclick=()=>{setMode(b.dataset.mode);$('#tabs').
 $('#bMode').onclick=e=>{e.stopPropagation();$('#tabs').hidden=!$('#tabs').hidden;};
 document.addEventListener('pointerdown',e=>{if(!$('#tabs').hidden&&!e.target.closest('#modeWrap'))$('#tabs').hidden=true;});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#tabs').hidden=true;});
-$$('#tools button').forEach(b=>b.onclick=()=>{if(ui.photo){ui.photo.stage=null;}ui.tool=b.dataset.tool;ui.sel=null;ui.tpl=null;ui.placing=null;ui.noteTool=null;ui.dimA=null;ui.ghost=null;updateUI();draw();if(ui.tool==='select'||ui.tool==='flow')setDrawer('L');else if(ui.tool==='draw')setDrawer('L');});
+$$('#tools button').forEach(b=>b.onclick=()=>{if(ui.photo){ui.photo.stage=null;}ui.tool=b.dataset.tool;ui.sel=null;ui.tpl=null;ui.placing=null;ui.noteTool=null;ui.dimA=null;ui.ghost=null;updateUI();draw();if(ui.tool==='flow')setDrawer('L');else setDrawer(null);});
 $$('#cmps button').forEach(b=>b.onclick=()=>{ui.cmp=b.dataset.cmp;fit();updateUI();draw();});
 $('#bUndo').onclick=undo;$('#bRedo').onclick=redo;
 $('#bAddRail').onclick=()=>startPlace('rail');
@@ -3117,7 +3117,7 @@ function lsGet(k){try{return localStorage.getItem(k);}catch(_){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(_){}}
 function applyPanelMode(){if(!document.querySelector('#sideL.open,#sideR.open'))document.body.classList.remove('drawer');}
 window.addEventListener('resize',applyPanelMode);
-applyPanelMode();setDrawer("L");
+applyPanelMode();
 function refreshTabLabel(){
   const open=$('#sideL').classList.contains('open');
   $('#bSide').innerHTML=ui.tool==='draw'?'間<br>取':(ui.tool==='flow'?'追<br>加':'屋<br>内');
@@ -3184,7 +3184,7 @@ window.addEventListener('keydown',e=>{
   const STEPS=[
     {tool:'draw',no:'① 壁を描く',title:'まず、家の骨組み（壁）を描きます',
      text:'指やマウスで線をなぞって離すと、まっすぐな壁になります。四角い部屋は、下の見本のように、ぐるっと一周して始めの位置まで戻ると閉じます。まちがえた壁は、タップして選び、上の「削除」で消せます。'},
-    {tool:'select',no:'② 選ぶ・動かす',title:'次に、家具や手すり・扉を置きます',
+    {tool:'select',no:'② 内容を編集',title:'次に、家具や手すり・扉を置きます',
      text:'左の「屋内」パネルから置きたいものを選び、図面をタップすると置けます。置いたものは、ドラッグで動かせます。何もない所をなぞると範囲選択ができ、まとめて動かしたり消したりできます。'},
     {tool:'flow',no:'③ 詳細の追加',title:'最後に、補足を書き込みます',
      text:'人の動き（動線）を、指やマウスでなぞって描けます。文字・番号・寸法線・数値メモ・吹き出しは、左端のパネルのボタンから追加します。'}
