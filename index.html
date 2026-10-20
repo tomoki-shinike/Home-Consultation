@@ -76,8 +76,12 @@ header #setRows #title::placeholder{color:#98a2b3}
 .tplCard canvas{width:100%;height:64px;background:#f4f6fa;border-radius:6px}
 .tplCard small{font-weight:400;font-size:11px;color:#8a6d3b}
 @media (min-width:761px){body.drawerL #gPlace,body.drawerR #gPlace{left:calc(min(262px,80vw) + 52px)}}
-#bDiag{position:absolute;right:10px;top:10px;z-index:4;padding:7px 12px;border-radius:999px;font-size:13px;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.2)}
-#bDiag[hidden]{display:none}
+#stageBtns{position:absolute;right:10px;top:10px;z-index:4;display:flex;gap:6px}
+#stageBtns[hidden]{display:none}
+#bPhoto{padding:7px 12px;border-radius:999px;font-size:13px;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.2)}
+#bPhoto.on{background:#fff6e8;border-color:#b45309;color:#92400e;font-weight:700}
+#bDiag{padding:7px 12px;border-radius:999px;font-size:13px;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.2)}
+
 #fileMenu{position:absolute;right:0;top:calc(100% + 6px);z-index:30;background:#fff;border:1px solid #47526a;border-radius:10px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:4px;min-width:290px}
 #fileMenu[hidden]{display:none}
 #lTutAuto{display:flex;align-items:center;gap:10px;padding:11px 12px;min-height:44px;font-size:15px;color:#1f2933;cursor:pointer;border-top:1px solid #e3e7ee;margin-top:2px}
@@ -116,6 +120,10 @@ header #fileMenu button:active{background:#e8eff9}
 .pi canvas.pic{width:100%;height:44px;object-fit:contain;display:block;background:#f4f6fa;border-radius:6px}
 .pi b{font-size:13px;font-weight:600}
 .pi span{font-size:10.5px;color:var(--sub)}
+#gPhoto{position:absolute;top:46px;left:10px;right:10px;z-index:8;justify-content:center;padding:6px 10px;border:2px solid #b45309;border-radius:10px;background:#fff6e8;box-shadow:0 2px 8px rgba(15,23,42,.2);gap:8px}
+#gPhoto[hidden],#gPhoto .grp[hidden]{display:none}
+#gPhoto label{display:flex;align-items:center;gap:6px;font-size:13px}
+#gPhoto input[type=range]{width:90px}
 #gPlace{position:absolute;top:46px;left:10px;right:10px;z-index:8;justify-content:center;padding:6px 10px;border:2px solid #0f766e;border-radius:10px;background:#e6f6f3;box-shadow:0 2px 8px rgba(15,23,42,.2)}
 #gRail{display:none!important}
 #tut{position:fixed;inset:0;z-index:80;cursor:pointer}
@@ -241,7 +249,7 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
         <button id="bPrint">印刷・画像保存</button>
         <button id="bTut">使い方を見る</button>
         <label id="lTutAuto"><input type="checkbox" id="chkTutAuto">起動時に使い方を毎回表示する</label>
-        <div id="verTag">版 v60（この表示が変わっていれば、新しい版が読み込まれています）</div>
+        <div id="verTag">版 v62（この表示が変わっていれば、新しい版が読み込まれています）</div>
       </div>
     </div>
   </header>
@@ -371,7 +379,11 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
     <div id="stage">
       <canvas id="cv"></canvas>
       <div id="badge"></div>
-      <button id="bDiag" title="ONにすると、なぞった線が斜めのまま壁になります">／ 斜めの壁：OFF</button>
+      <div id="stageBtns">
+        <button id="bPhoto" title="手書きの図の写真を下絵にして、その上からなぞります">📷 写真</button>
+        <button id="bDiag" title="ONにすると、なぞった線が斜めのまま壁になります">／ 斜めの壁：OFF</button>
+      </div>
+      <input type="file" id="photoIn" accept="image/*" hidden>
       <div id="tabStack">
         <button id="bSide" class="edgeTab" aria-label="屋内パネルを開く">屋<br>内</button>
         <button id="bSideR" class="edgeTab" aria-label="屋外パネルを開く">屋<br>外</button>
@@ -383,6 +395,22 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
       <button id="bPlaceAuto">おまかせ配置（部屋に自動）</button>
       <button id="bTplPut" class="primary" hidden>ここに置く</button>
       <button id="bPlaceEnd" class="primary">やめる</button>
+    </div>
+    <div class="grp" id="gPhoto" hidden>
+      <span id="phAdj" class="grp">
+        <label>濃さ<input type="range" id="phAlpha" min="10" max="100" value="50"></label>
+        <label>傾き<input type="range" id="phTilt" min="-150" max="150" value="0"></label>
+        <button id="phRot">90°回す</button>
+        <button id="phAuto">自動で壁を探す</button>
+        <button id="phDel">外す</button>
+        <button id="phDone" class="primary">完了</button>
+      </span>
+      <span id="phDet" class="grp" hidden>
+        <label>感度<input type="range" id="phSens" min="10" max="95" value="50"></label>
+        <b id="phCnt" style="font-size:13px;color:#b45309"></b>
+        <button id="phUse" class="primary">壁にする</button>
+        <button id="phCancel">やめる</button>
+      </span>
     </div>
       <div id="gMulti" class="grp" hidden><b id="multiTxt"></b><button id="bMultiDel" class="primary">まとめて削除</button><button id="bMultiClear">選択をやめる</button></div>
       <div id="hint"></div>
@@ -1468,6 +1496,7 @@ function panel(ctx,w,h,kind,o){
   MONO=!!o.mono;
   ctx.lineJoin='miter';
   if(o.grid)drawGrid(ctx,w,h,v);
+  if(o.gesture&&ui.photo)drawPhoto(ctx,v);
   const lw=Math.max(3*k,105*v.s);
   const bw=wallsOf('base'),rw=wallsOf('reform');
   const items=[];
@@ -1586,6 +1615,7 @@ function panel(ctx,w,h,kind,o){
     ctx.beginPath();ctx.arc(gx,gy,9,0,PI*2);ctx.stroke();ctx.restore();
   }
   if(o.gesture&&ui.noteTool==='dim'&&ui.dimA&&!ui.ghost){const ax=ui.dimA.x*v.s+v.ox,ay=ui.dimA.y*v.s+v.oy;ctx.fillStyle='#0f766e';ctx.beginPath();ctx.arc(ax,ay,6,0,PI*2);ctx.fill();}
+  if(o.gesture&&ui.photo)drawPhotoOverlay(ctx,v,k);
   if(o.gesture&&ui.tpl&&ui.ghost&&editLayer())drawTplGhost(ctx,v,k);
   // 手すりを置く前の見本（マウスの位置に薄く表示）
   if(o.gesture&&ui.placing&&ui.ghost&&editLayer()){
@@ -2235,6 +2265,177 @@ function placeAt(p){
   if(m)toast('手すりを結合しました（直線・L字）');
 }
 
+// ---- 手書き図の写真：下絵にしてなぞる（A）／壁を自動で探す（B）。写真は保存データに含めない ----
+function photoLoad(file){
+  if(!file)return;
+  const url=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>{
+    const M=1600,sc=Math.min(1,M/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(im.naturalWidth*sc));c.height=Math.max(1,Math.round(im.naturalHeight*sc));
+    c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(url);
+    const W=stage.clientWidth,H=stage.clientHeight,ctr=s2w({x:W/2,y:H/2});
+    ui.autoFit=false;ui.tpl=null;ui.ghost=null;
+    ui.photo={cv:c,cx:ctr.x,cy:ctr.y,s:Math.min(W/c.width,H/c.height)*.85/view.s,rot:0,tilt:0,alpha:.5,stage:'adjust',cands:null,det:null};
+    $('#phAlpha').value=50;$('#phTilt').value=0;
+    setDrawer(null);updateUI();draw();
+    toast('写真を指（マウス）でドラッグして動かし、2本指（ホイール）で大きさを合わせてください。線がそろわないときは「傾き」と「90°回す」を使います');
+  };
+  im.onerror=()=>{URL.revokeObjectURL(url);toast('この写真は読み込めませんでした');};
+  im.src=url;
+}
+function photoUI(){
+  const P=ui.photo,on=!!(P&&P.stage&&ui.tool==='draw'&&editLayer());
+  $('#gPhoto').hidden=!on;$('#bPhoto').classList.toggle('on',!!P);
+  if(!on)return;
+  $('#phAdj').hidden=P.stage!=='adjust';$('#phDet').hidden=P.stage!=='detect';
+  if(P.stage==='detect'){const c=(P.cands||[]).filter(x=>x.on).length;$('#phCnt').textContent=(P.cands||[]).length+'本見つかりました（使う：'+c+'本）';$('#phUse').disabled=!c;}
+}
+function drawPhoto(ctx,v){
+  const P=ui.photo;if(!P)return;
+  ctx.save();ctx.globalAlpha=P.alpha;
+  ctx.translate(P.cx*v.s+v.ox,P.cy*v.s+v.oy);ctx.rotate((P.rot*90+P.tilt)*PI/180);ctx.scale(P.s*v.s,P.s*v.s);
+  ctx.drawImage(P.cv,-P.cv.width/2,-P.cv.height/2);ctx.restore();
+}
+function drawPhotoOverlay(ctx,v,k){
+  const P=ui.photo;if(!P)return;
+  ctx.save();ctx.lineCap='round';
+  if(P.stage==='detect'&&P.cands){
+    for(const c of P.cands){
+      ctx.strokeStyle=c.on?'rgba(234,88,12,.85)':'rgba(120,120,120,.55)';ctx.lineWidth=c.on?Math.max(5,90*v.s):3;ctx.setLineDash(c.on?[]:[6,5]);
+      ctx.beginPath();ctx.moveTo(c.x1*v.s+v.ox,c.y1*v.s+v.oy);ctx.lineTo(c.x2*v.s+v.ox,c.y2*v.s+v.oy);ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+function photoScaleAt(wx,wy,f){
+  const P=ui.photo;if(!P)return;
+  const ns=clamp(P.s*f,0.05,200),ff=ns/P.s;
+  P.cx=wx+(P.cx-wx)*ff;P.cy=wy+(P.cy-wy)*ff;P.s=ns;
+}
+// ---- 自動で壁を探す（通信なし・端末の中だけで計算）----
+function photoDetect(){
+  const P=ui.photo;if(!P)return;
+  const th=(P.rot*90+P.tilt)*PI/180,ct=Math.cos(th),st=Math.sin(th),hw=P.cv.width/2,hh=P.cv.height/2;
+  const xs=[],ys=[];
+  for(const[u,w]of[[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh]]){xs.push(P.cx+(u*ct-w*st)*P.s);ys.push(P.cy+(u*st+w*ct)*P.s);}
+  const minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+  const bw=maxx-minx,bh=maxy-miny,N=900,ds=Math.max(bw,bh)/N,W=Math.max(8,Math.ceil(bw/ds)),H=Math.max(8,Math.ceil(bh/ds));
+  const oc=document.createElement('canvas');oc.width=W;oc.height=H;
+  const o=oc.getContext('2d');o.fillStyle='#fff';o.fillRect(0,0,W,H);
+  o.translate((P.cx-minx)/ds,(P.cy-miny)/ds);o.rotate(th);o.scale(P.s/ds,P.s/ds);o.drawImage(P.cv,-hw,-hh);
+  const d=o.getImageData(0,0,W,H).data,g=new Uint8Array(W*H);
+  for(let i=0;i<W*H;i++)g[i]=(d[i*4]*299+d[i*4+1]*587+d[i*4+2]*114)/1000;
+  P.det={minx,miny,ds,W,H,g};
+  P.stage='detect';
+  photoDetectRun(+$('#phSens').value);
+  updateUI();draw();
+  if(!P.cands.length)toast('壁らしい線が見つかりませんでした。感度を上げるか、写真の傾きと大きさを見直してください');
+  else toast('橙色の線が壁の候補です。違う線は、タップで外せます（もう一度タップで戻ります）');
+}
+function photoDetectRun(t){
+  const P=ui.photo,D0=P&&P.det;if(!D0)return;
+  const{W,H,g,minx,miny,ds}=D0;
+  // 紙の明るさ（明るい方から10%の値）をもとに、「線」とみなす暗さを決める
+  const hist=new Uint32Array(256);for(let i=0;i<W*H;i++)hist[g[i]]++;
+  let acc=0,paper=255;for(let v=255;v>=0;v--){acc+=hist[v];if(acc>=W*H*.10){paper=v;break;}}
+  const absT=paper*(0.55+0.004*t);
+  // 周りより暗いかどうか（まわり平均との比較）
+  const I=new Float64Array((W+1)*(H+1));
+  for(let y=0;y<H;y++){let row=0;for(let x=0;x<W;x++){row+=g[y*W+x];I[(y+1)*(W+1)+x+1]=I[y*(W+1)+x+1]+row;}}
+  const rr=Math.round(Math.max(W,H)/40),dark=new Uint8Array(W*H);
+  for(let y=0;y<H;y++){const y0=Math.max(0,y-rr),y1=Math.min(H,y+rr+1);
+    for(let x=0;x<W;x++){const x0=Math.max(0,x-rr),x1=Math.min(W,x+rr+1);
+      const m=(I[y1*(W+1)+x1]-I[y0*(W+1)+x1]-I[y1*(W+1)+x0]+I[y0*(W+1)+x0])/((x1-x0)*(y1-y0));
+      const v=g[y*W+x];dark[y*W+x]=(v<absT&&v<m*0.88)?1:0;}}
+  // 粗いマス（4px四方）にまとめる：手書きの線の揺れを吸収する
+  const cs=4,CW=Math.ceil(W/cs),CH=Math.ceil(H/cs),cd=new Uint8Array(CW*CH);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(dark[y*W+x])cd[((y/cs)|0)*CW+((x/cs)|0)]++;
+  for(let i=0;i<cd.length;i++)cd[i]=cd[i]>=3?1:0;
+  const minLen=Math.max(8,Math.round(Math.max(CW,CH)*.06));
+  // 横向き（hor=true）または縦向きの線を取り出す
+  function extract(hor){
+    const A=hor?CH:CW,B=hor?CW:CH,at=(a,b)=>hor?cd[a*CW+b]:cd[b*CW+a];
+    let groups=[],active=[];
+    for(let a=0;a<A;a++){
+      const runs=[];let b=0;
+      while(b<B){
+        if(!at(a,b)){b++;continue;}
+        let s0=b,e=b,gap=0;b++;
+        while(b<B){if(at(a,b)){e=b;gap=0;}else{gap++;if(gap>2)break;}b++;}
+        if(e-s0+1>=minLen)runs.push([s0,e]);
+      }
+      const next=[];
+      for(const[r0,r1]of runs){
+        let hit=null;
+        for(const gp of active){const ov=Math.min(r1,gp.x1)-Math.max(r0,gp.x0)+1;if(ov>=.5*Math.min(r1-r0+1,gp.x1-gp.x0+1)){hit=gp;break;}}
+        if(hit){hit.rows.push(a);hit.x0=Math.min(hit.x0,r0);hit.x1=Math.max(hit.x1,r1);next.push(hit);}
+        else{const ng={rows:[a],x0:r0,x1:r1};groups.push(ng);next.push(ng);}
+      }
+      active=next;
+    }
+    const out=[];
+    for(const gp of groups){if(gp.rows.length>8)continue;const pos=gp.rows.reduce((p,q)=>p+q,0)/gp.rows.length+.5;out.push({pos,a0:gp.x0,a1:gp.x1+1});}
+    // 同じ線上でつながるものを合体
+    out.sort((p,q)=>p.pos-q.pos);
+    let merged=true;
+    while(merged){merged=false;
+      for(let i=0;i<out.length&&!merged;i++)for(let j=i+1;j<out.length;j++){
+        const p1=out[i],q1=out[j];
+        if(Math.abs(p1.pos-q1.pos)<=2.5&&q1.a0<=p1.a1+3&&p1.a0<=q1.a1+3){p1.pos=(p1.pos+q1.pos)/2;p1.a0=Math.min(p1.a0,q1.a0);p1.a1=Math.max(p1.a1,q1.a1);out.splice(j,1);merged=true;break;}
+      }
+    }
+    return out;
+  }
+  const stp=ui.step>0?ui.step:455,sn=v=>Math.round(v/stp)*stp;
+  const hs=extract(true).map(q=>({o:'H',p:sn(miny+q.pos*cs*ds),a:sn(minx+q.a0*cs*ds),b:sn(minx+q.a1*cs*ds)}));
+  const vs=extract(false).map(q=>({o:'V',p:sn(minx+q.pos*cs*ds),a:sn(miny+q.a0*cs*ds),b:sn(miny+q.a1*cs*ds)}));
+  // 近くで出会う線は、角や丁字（T字）につなぐ
+  const tol=Math.max(stp*1.6,700);
+  const fix=(L,Xs)=>{for(const s1 of L){
+    for(const e of['a','b']){let best=null,bd=tol+1;
+      for(const t2 of Xs){if(s1.p<t2.a-tol||s1.p>t2.b+tol)continue;const dd=Math.abs(t2.p-s1[e]);if(dd<bd){bd=dd;best=t2;}}
+      if(best&&bd<=tol)s1[e]=best.p;}
+    if(s1.a>s1.b){const t2=s1.a;s1.a=s1.b;s1.b=t2;}}};
+  fix(hs,vs);fix(vs,hs);
+  const cands=[];
+  for(const q of hs)if(q.b-q.a>=stp)cands.push({x1:q.a,y1:q.p,x2:q.b,y2:q.p,on:true});
+  for(const q of vs)if(q.b-q.a>=stp)cands.push({x1:q.p,y1:q.a,x2:q.p,y2:q.b,on:true});
+  P.cands=cands;
+}
+function photoCandUse(){
+  const P=ui.photo,el=editLayer();if(!P||!P.cands||!el)return;
+  const use=P.cands.filter(c=>c.on);if(!use.length)return;
+  const L=D[el],pre=JSON.stringify(D),nm=new Map();
+  const nodeFor=(x,y)=>{const kk=x+','+y;if(!nm.has(kk)){const n={id:nid(),x,y};L.nodes.push(n);nm.set(kk,n.id);}return nm.get(kk);};
+  for(const c of use)L.walls.push({id:nid(),a:nodeFor(c.x1,c.y1),b:nodeFor(c.x2,c.y2)});
+  normalize(L);P.stage=null;P.cands=null;P.det=null;ui.sel=null;commit(pre);updateUI();draw();
+  toast('壁にしました（'+use.length+'本）。写真は下絵として残っています。壁は普通に直せます');
+}
+function photoCandHit(p){
+  const P=ui.photo;if(!P||!P.cands)return null;
+  let best=null,bd=18;
+  for(const c of P.cands){
+    const x1=c.x1*view.s+view.ox,y1=c.y1*view.s+view.oy,x2=c.x2*view.s+view.ox,y2=c.y2*view.s+view.oy;
+    const dd=distSeg(p.x,p.y,x1,y1,x2,y2);if(dd<bd){bd=dd;best=c;}
+  }
+  return best;
+}
+$('#bPhoto').onclick=()=>{
+  if(!editLayer())return;
+  if(!ui.photo){$('#photoIn').value='';$('#photoIn').click();return;}
+  ui.photo.stage=ui.photo.stage||'adjust';ui.tpl=null;updateUI();draw();
+};
+$('#photoIn').onchange=e=>{const f=e.target.files&&e.target.files[0];if(f)photoLoad(f);};
+$('#phAlpha').oninput=e=>{if(ui.photo){ui.photo.alpha=e.target.value/100;draw();}};
+$('#phTilt').oninput=e=>{if(ui.photo){ui.photo.tilt=e.target.value/10;draw();}};
+$('#phRot').onclick=()=>{if(ui.photo){ui.photo.rot=(ui.photo.rot+1)%4;draw();}};
+$('#phAuto').onclick=photoDetect;
+$('#phDel').onclick=()=>{ui.photo=null;updateUI();draw();};
+$('#phDone').onclick=()=>{if(ui.photo){ui.photo.stage=null;}updateUI();draw();};
+$('#phSens').oninput=e=>{if(ui.photo&&ui.photo.stage==='detect'){photoDetectRun(+e.target.value);photoUI();draw();}};
+$('#phUse').onclick=photoCandUse;
+$('#phCancel').onclick=()=>{const P=ui.photo;if(P){P.stage='adjust';P.cands=null;}updateUI();draw();};
+
 // ---- 間取りの型（壁だけのテンプレート）----
 const TPL=[
  {id:'t1',n:'1部屋',d:'6畳くらい',w:3640,h:2730,segs:[[0,0,3640,0],[3640,0,3640,2730],[3640,2730,0,2730],[0,2730,0,0]]},
@@ -2261,6 +2462,7 @@ function buildTplList(){
 function startTpl(id){
   if(!editLayer()){toast('比較表示中は置けません。「編集に戻る」を押してください');return;}
   ui.placing=null;ui.noteTool=null;ui.dimA=null;ui.sel=null;ui.ghost=null;ui.autoFit=false;
+  if(ui.photo){ui.photo.stage=null;}
   ui.tpl={id,rot:0};updateUI();draw();
   toast(matchMedia('(pointer:coarse)').matches?'置きたい場所をタップし、ドラッグで位置を直して「ここに置く」を押してください':'置きたい場所でクリックしてください');
 }
@@ -2612,7 +2814,8 @@ $('#bDiag').textContent=ui.diag?'／ 斜めの壁：ON':'／ 斜めの壁：OFF'
   $('#bSide').hidden=!showL;$('#bSideR').hidden=!showP;
   $('#secPal').hidden=!showP;$('#secUse').hidden=!showP;
   if(!showP)$('#secSel').hidden=true;
-  $('#bDiag').hidden=ui.tool!=='draw'||!['base','reform'].includes(ui.mode);
+  $('#stageBtns').hidden=ui.tool!=='draw'||!['base','reform'].includes(ui.mode);
+  photoUI();
   $('#gMulti').hidden=!(edit&&s&&s.type==='multi');
   if(s&&s.type==='multi')$('#multiTxt').textContent=multiCount(s)+'個を選択中';
   $('#flowNote').hidden=ui.tool!=='flow';
@@ -2679,6 +2882,11 @@ cv.addEventListener('pointerdown',e=>{
   if(ptrs.size===2){startPinch();return;}
   if(ptrs.size>2)return;
   if((e.pointerType==='mouse'&&e.button!==0)||ui.mode==='compare'){g={type:'pan',start:p,o0:{ox:view.ox,oy:view.oy},kind:'pan'};return;}
+  if(ui.photo&&ui.tool==='draw'&&ui.photo.stage==='adjust'){
+    const P=ui.photo;
+    g={type:'photo',start:p,c0:{cx:P.cx,cy:P.cy}};return;
+  }
+  if(ui.photo&&ui.tool==='draw'&&ui.photo.stage==='detect'){g={type:'cand',start:p,moved:false,o0:{ox:view.ox,oy:view.oy}};return;}
   if(ui.tpl&&ui.tool==='draw'){g={type:'tpl',start:p,moved:false,o0:{ox:view.ox,oy:view.oy},touch:e.pointerType!=='mouse'};ui.ghost=p;draw();return;}
   if(((ui.placing&&ui.tool==='select')||(ui.noteTool&&ui.tool==='flow'))){g={type:'place',start:p,moved:false,o0:{ox:view.ox,oy:view.oy}};ui.ghost=p;draw();return;}
   const fh=ui.tool==='flow'?(hitHandle(p)||hitNote(p)||hitFlow(p)):null;
@@ -2696,6 +2904,8 @@ cv.addEventListener('pointermove',e=>{
   const p=pos(e);ptrs.set(e.pointerId,p);
   if(pinch&&ptrs.size>=2){updatePinch();return;}
   if(!g)return;
+  if(g.type==='photo'){const P=ui.photo;if(P){P.cx=g.c0.cx+(p.x-g.start.x)/view.s;P.cy=g.c0.cy+(p.y-g.start.y)/view.s;draw();}return;}
+  if(g.type==='cand'&&!g.moved&&Math.hypot(p.x-g.start.x,p.y-g.start.y)>8){g.moved=true;g.type='pan';}
   if(g.type==='tpl'){
     if(g.touch){ui.ghost=p;draw();return;}
     if(!g.moved&&Math.hypot(p.x-g.start.x,p.y-g.start.y)>8){g.moved=true;g.type='pan';ui.ghost=null;}
@@ -2721,6 +2931,7 @@ function endPtr(e){
   if(gg.type==='draw')finishStroke(gg);
   else if(gg.type==='flowdraw')finishFlow(gg);
   else if(gg.type==='tpl'){if(!gg.touch&&!gg.moved)placeTpl();}
+  else if(gg.type==='cand'){const c=photoCandHit(gg.start);if(c){c.on=!c.on;photoUI();}}
   else if(gg.type==='place'){if(!gg.moved){if(ui.noteTool)placeNote(gg.start);else placeAt(gg.start);if(e.pointerType==='touch')ui.ghost=null;}}
   else if(gg.type==='sel'){if(!gg.moved)tapSelect(gg.hit,gg.start);else finishDrag(gg);}
   draw();
@@ -2728,17 +2939,21 @@ function endPtr(e){
 cv.addEventListener('pointerup',endPtr);
 cv.addEventListener('pointercancel',endPtr);
 cv.addEventListener('contextmenu',e=>e.preventDefault());
-cv.addEventListener('wheel',e=>{e.preventDefault();ui.autoFit=false;zoomAt(pos(e),Math.exp(-e.deltaY*0.0015));},{passive:false});
+cv.addEventListener('wheel',e=>{e.preventDefault();ui.autoFit=false;if(ui.photo&&ui.photo.stage==='adjust'&&ui.tool==='draw'){const w=s2w(pos(e));photoScaleAt(w.x,w.y,Math.exp(-e.deltaY*0.0015));draw();return;}zoomAt(pos(e),Math.exp(-e.deltaY*0.0015));},{passive:false});
 function startPinch(){
   ui.autoFit=false;
   if(g&&g.type==='sel'&&g.moved)cancelDrag(g);
   g=null;
   const[a,b]=[...ptrs.values()];
-  pinch={d0:Math.hypot(a.x-b.x,a.y-b.y)||1,c0:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},v0:{...view}};
+  pinch={d0:Math.hypot(a.x-b.x,a.y-b.y)||1,c0:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},v0:{...view},p0:ui.photo?{s:ui.photo.s,cx:ui.photo.cx,cy:ui.photo.cy}:null};
   draw();
 }
 function updatePinch(){
   const[a,b]=[...ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y)||1,c={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+  if(ui.photo&&ui.photo.stage==='adjust'&&ui.tool==='draw'&&pinch.p0){
+    const P=ui.photo,f=d/pinch.d0,w0={x:(pinch.c0.x-view.ox)/view.s,y:(pinch.c0.y-view.oy)/view.s},w1={x:(c.x-view.ox)/view.s,y:(c.y-view.oy)/view.s};
+    P.s=clamp(pinch.p0.s*f,0.05,200);P.cx=w1.x+(pinch.p0.cx-w0.x)*f;P.cy=w1.y+(pinch.p0.cy-w0.y)*f;draw();return;
+  }
   const s=clamp(pinch.v0.s*d/pinch.d0,0.01,1.5);
   const wx=(pinch.c0.x-pinch.v0.ox)/pinch.v0.s,wy=(pinch.c0.y-pinch.v0.oy)/pinch.v0.s;
   view.s=s;view.ox=c.x-wx*s;view.oy=c.y-wy*s;draw();
@@ -2847,7 +3062,7 @@ $$('#tabs button').forEach(b=>b.onclick=()=>{setMode(b.dataset.mode);$('#tabs').
 $('#bMode').onclick=e=>{e.stopPropagation();$('#tabs').hidden=!$('#tabs').hidden;};
 document.addEventListener('pointerdown',e=>{if(!$('#tabs').hidden&&!e.target.closest('#modeWrap'))$('#tabs').hidden=true;});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#tabs').hidden=true;});
-$$('#tools button').forEach(b=>b.onclick=()=>{ui.tool=b.dataset.tool;ui.sel=null;ui.tpl=null;ui.placing=null;ui.noteTool=null;ui.dimA=null;ui.ghost=null;updateUI();draw();if(ui.tool==='select'||ui.tool==='flow')setDrawer('L');else if(ui.tool==='draw')setDrawer('L');});
+$$('#tools button').forEach(b=>b.onclick=()=>{if(ui.photo){ui.photo.stage=null;}ui.tool=b.dataset.tool;ui.sel=null;ui.tpl=null;ui.placing=null;ui.noteTool=null;ui.dimA=null;ui.ghost=null;updateUI();draw();if(ui.tool==='select'||ui.tool==='flow')setDrawer('L');else if(ui.tool==='draw')setDrawer('L');});
 $$('#cmps button').forEach(b=>b.onclick=()=>{ui.cmp=b.dataset.cmp;fit();updateUI();draw();});
 $('#bUndo').onclick=undo;$('#bRedo').onclick=redo;
 $('#bAddRail').onclick=()=>startPlace('rail');
