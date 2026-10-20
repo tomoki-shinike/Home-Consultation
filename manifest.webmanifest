@@ -1,6 +1,6 @@
 {
-  "name": "間取りシミュレーター",
-  "short_name": "間取り",
+  "name": "住宅環境ツール",
+  "short_name": "住宅環境ツール",
   "description": "住宅改修・退院前訪問のための間取り作成ツール",
   "start_url": "./index.html",
   "scope": "./",
