@@ -1,6 +1,6 @@
 // 住宅環境ツール：オフラインで使うための保存係（Service Worker）
 // ファイルを更新したら、下の VERSION の数字を1つ上げてください。
-const VERSION = 'madori-v65';
+const VERSION = 'madori-v66';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

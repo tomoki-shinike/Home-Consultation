@@ -249,7 +249,7 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
         <button id="bPrint">印刷・画像保存</button>
         <button id="bTut">使い方を見る</button>
         <label id="lTutAuto"><input type="checkbox" id="chkTutAuto">起動時に使い方を毎回表示する</label>
-        <div id="verTag">版 v65（この表示が変わっていれば、新しい版が読み込まれています）</div>
+        <div id="verTag">版 v66（この表示が変わっていれば、新しい版が読み込まれています）</div>
       </div>
     </div>
   </header>
@@ -1917,7 +1917,9 @@ function tapSelect(h,p){
   if(!h){
     const m=mapNow(),w=s2w(p);
     ui.sel=m.at(w.x,w.y)>=0?{type:'room',x:w.x,y:w.y}:null;
-    updateUI();return;
+    updateUI();
+    if(ui.sel&&ui.tool==='select')setDrawer('L'); // 部屋をタップするたびに、屋内パネルを開く（同じ部屋でも、パネルを閉じたあとでも）
+    return;
   }
   if(h.kind==='handle')return;
   if(h.kind==='note'){ui.sel={type:'note',id:h.id};updateUI();return;}
