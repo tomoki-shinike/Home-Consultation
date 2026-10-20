@@ -249,7 +249,7 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
         <button id="bPrint">印刷・画像保存</button>
         <button id="bTut">使い方を見る</button>
         <label id="lTutAuto"><input type="checkbox" id="chkTutAuto">起動時に使い方を毎回表示する</label>
-        <div id="verTag">版 v62（この表示が変わっていれば、新しい版が読み込まれています）</div>
+        <div id="verTag">版 v63（この表示が変わっていれば、新しい版が読み込まれています）</div>
       </div>
     </div>
   </header>
@@ -2463,7 +2463,7 @@ function startTpl(id){
   if(!editLayer()){toast('比較表示中は置けません。「編集に戻る」を押してください');return;}
   ui.placing=null;ui.noteTool=null;ui.dimA=null;ui.sel=null;ui.ghost=null;ui.autoFit=false;
   if(ui.photo){ui.photo.stage=null;}
-  ui.tpl={id,rot:0};updateUI();draw();
+  ui.tpl={id,rot:0};setDrawer(null);updateUI();draw();
   toast(matchMedia('(pointer:coarse)').matches?'置きたい場所をタップし、ドラッグで位置を直して「ここに置く」を押してください':'置きたい場所でクリックしてください');
 }
 function tplVisibleWalls(){
