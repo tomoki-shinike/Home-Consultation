@@ -249,7 +249,7 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
         <button id="bPrint">印刷・画像保存</button>
         <button id="bTut">使い方を見る</button>
         <label id="lTutAuto"><input type="checkbox" id="chkTutAuto">起動時に使い方を毎回表示する</label>
-        <div id="verTag">版 v64（この表示が変わっていれば、新しい版が読み込まれています）</div>
+        <div id="verTag">版 v65（この表示が変わっていれば、新しい版が読み込まれています）</div>
       </div>
     </div>
   </header>
@@ -2823,7 +2823,7 @@ $('#bDiag').textContent=ui.diag?'／ 斜めの壁：ON':'／ 斜めの壁：OFF'
   {const so=$('#secOps');so.hidden=![...so.children].some(c=>!c.hidden);}
   {const k=s?(s.type+':'+(s.id!==undefined?s.id:'')):'';
    if(k!==ui._selKey){ui._selKey=k;
-     if(s&&edit&&(s.type==='note'||(s.type==='flow'&&ui.tool==='flow')))setDrawer('L');}}
+     if(s&&edit&&(s.type==='note'||(s.type==='flow'&&ui.tool==='flow')||(s.type==='room'&&ui.tool==='select')))setDrawer('L');}}
   $('#bFlip').hidden=ui.cmp!=='toggle';
   $('#bUndo').disabled=!undoStack.length;$('#bRedo').disabled=!redoStack.length;
   $('#bDel').disabled=!((sw&&sw.layer===el)||(sf&&sf.layer===el)||(sfl&&sfl.layer===el)||(snt&&snt.layer===el));
