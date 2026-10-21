@@ -191,8 +191,40 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
   html,body{height:auto;overflow:visible;background:#fff}
   #app,.overlay{display:none!important}
   #printArea{display:block}
-  #printArea img{width:100%;height:auto;display:block}
+  #printArea img{width:100%;height:auto;display:block;break-after:page;page-break-after:always}
+  #printArea img:last-child{break-after:auto;page-break-after:auto}
 }
+/*PHOTO-CSS*/
+#gPhotos{display:flex;flex-direction:column;gap:8px;padding:8px;border:2px solid #0f766e;border-radius:10px;background:#effaf8}
+#gPhotos[hidden]{display:none}
+#gPhotos .phHead{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#0b5c55}
+#gPhotos .phBtns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#gPhotos .phBtns button{padding:8px 4px;white-space:nowrap}
+#gPhotos .phNote{font-size:11.5px;color:#4b5c59;line-height:1.5}
+#phList{display:flex;flex-direction:column;gap:8px;max-height:62vh;overflow-y:auto;overscroll-behavior:contain;padding-right:2px}
+.phCard{background:#fff;border:1px solid #b8d8d3;border-radius:8px;padding:5px 6px;display:flex;flex-direction:column;gap:4px;position:relative}
+.phCard.on{border-color:#f59f00;box-shadow:0 0 0 2px rgba(245,159,0,.5)}
+.phCard.drag{opacity:.85;z-index:5;box-shadow:0 6px 16px rgba(0,0,0,.25);pointer-events:none}
+.phDrop{height:4px;border-radius:2px;background:#0f766e;margin:-2px 0}
+.phCard .r1{display:flex;align-items:center;gap:6px}
+.phCard .hd{font-size:20px;line-height:1;color:#7a8a87;padding:8px 6px;margin:-6px -2px -6px -4px;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.phCard .th{width:64px;height:48px;flex:none;border-radius:6px;background:#dde5e3;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#667085;overflow:hidden}
+.phCard .th img{width:100%;height:100%;object-fit:cover}
+.phCard .no{font-size:20px;color:#0b5c55;min-width:22px;text-align:center;flex:1;text-align:left}
+.phCard .mv{display:flex;gap:3px}
+.phCard .mv button{padding:2px 7px;font-size:12px;min-height:30px}
+.phCard .r2{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.phCard .r2 button{padding:5px 3px;font-size:12px;flex:1;white-space:nowrap}
+.phCard .dr{display:flex;flex-direction:column;gap:2px}
+.phCard .dl{font-size:11.5px;color:#475467}
+.phCard input[type=range]{width:100%}
+#phView{position:fixed;inset:0;z-index:75;background:rgba(10,15,25,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:10px}
+#phView[hidden]{display:none}
+#phView img{max-width:100%;max-height:calc(100% - 120px);object-fit:contain;border-radius:6px;background:#222}
+#phView .cap{color:#fff;font-size:15px;max-width:min(92vw,720px);text-align:center;line-height:1.55;white-space:pre-wrap}
+#phView .bar{display:flex;gap:8px}
+#phView .bar button{background:#2b3444;color:#fff;border:1px solid #47526a;border-radius:8px;padding:10px 16px;font-size:15px;min-height:44px}
+/*/PHOTO-CSS*/
 /*3D-CSS*/
 #b3d{white-space:nowrap}
 #v3d[hidden]{display:none}
@@ -249,7 +281,7 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
         <button id="bPrint">印刷・画像保存</button>
         <button id="bTut">使い方を見る</button>
         <label id="lTutAuto"><input type="checkbox" id="chkTutAuto">起動時に使い方を毎回表示する</label>
-        <div id="verTag">版 v72（この表示が変わっていれば、新しい版が読み込まれています）</div>
+        <div id="verTag">版 v76（この表示が変わっていれば、新しい版が読み込まれています）</div>
       </div>
     </div>
   </header>
@@ -308,7 +340,7 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
       </span>
     </div>
     <div class="note" id="flowNote">主な移動ルートを、指やマウスでなぞると動線が描けます。文字・番号・寸法線・数値メモ・吹き出しは、下のボタンで追加します。</div>
-    <div class="grp" id="gNote"><button id="bNoteText" style="border-color:#475467;color:#344054;font-weight:700">＋ 文字</button><button id="bNoteNum" style="border-color:#475467;color:#344054;font-weight:700">＋ 番号①</button><button id="bNoteDim" style="border-color:#475467;color:#344054;font-weight:700">＋ 寸法線</button><button id="bNoteVal" style="border-color:#475467;color:#344054;font-weight:700">＋ 数値メモ</button><button id="bNoteCall" style="border-color:#475467;color:#344054;font-weight:700">＋ 吹き出し</button></div>
+    <div class="grp" id="gNote"><button id="bNoteText" style="border-color:#475467;color:#344054;font-weight:700">＋ 文字</button><button id="bNoteDim" style="border-color:#475467;color:#344054;font-weight:700">＋ 寸法線</button><button id="bNoteVal" style="border-color:#475467;color:#344054;font-weight:700">＋ 数値メモ</button><button id="bNoteCall" style="border-color:#475467;color:#344054;font-weight:700">＋ 吹き出し</button></div>
     <div class="grp" id="pNote" hidden style="gap:6px;padding:4px 8px;border:2px solid #475467;border-radius:10px;background:#f2f4f7">
       <b id="nName" style="font-size:13px;color:#344054"></b>
       <label id="nPickRow"><span>よく使う文字（選ぶと入ります）</span><select id="nPick"><option value="">候補から選ぶ…</option><option>高さ</option><option>横幅</option><option>奥行</option></select></label>
@@ -318,6 +350,15 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
       <span id="nSzRow" class="grp" style="gap:4px"><button id="bNSm">文字を小さく</button><button id="bNLg">文字を大きく</button></span>
       <span id="nDimRow"><button id="bNAuto">実測を消す（図の長さに戻す）</button></span>
       <button id="bNDup">複製</button><button id="bNDel">削除</button>
+    </div>
+    <div id="gPhotos" hidden>
+      <div class="phHead"><b>📷 現地の写真</b><span id="phCount">0/20枚</span></div>
+      <div class="phBtns"><button id="bPhCam">カメラで撮る</button><button id="bPhLib">写真から選ぶ</button></div>
+      <input type="file" id="fPhCam" accept="image/*" capture="environment" hidden>
+      <input type="file" id="fPhLib" accept="image/*" multiple hidden>
+      <input type="file" id="fPhRep" accept="image/*" hidden>
+      <div class="phNote">標準のカメラで撮った写真を「写真から選ぶ」で取り込むのがおすすめです（ここに入るのは小さくしたコピーで、この端末の中だけに保存。「保存」ファイルにも入ります）。番号は「≡」のドラッグか▲▼で入れ替えられます。写真は「差し替え」で入れ替えられます。</div>
+      <div id="phList"></div>
     </div>
       </section>
       <section id="secSel">
@@ -428,6 +469,7 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
   </div>
 </div>
 
+<div id="phView" hidden><img id="phViewImg" alt=""><div class="cap" id="phViewCap"></div><div class="bar"><button id="phPrev">‹ 前</button><button id="phNext">次 ›</button><button id="phClose">閉じる</button></div></div>
 <div id="printDlg" class="overlay" hidden>
   <div class="dlg">
     <h3>印刷・画像保存</h3>
@@ -435,6 +477,7 @@ body.drawerL #tabStack,body.drawerR #tabStack{left:min(262px,80vw)}
     <label><input type="radio" name="pl" value="after">&nbsp;改修後のみ</label>
     <label><input type="radio" name="pl" value="before">&nbsp;現状のみ</label>
     <label style="border-top:1px solid #e3e7ee;margin-top:6px;padding-top:12px"><input type="checkbox" id="pMono">&nbsp;白黒（グレー）で出力</label>
+    <label id="pPhRow" hidden><input type="checkbox" id="pPh" checked>&nbsp;<span id="pPhTxt">写真ページも印刷する</span></label>
     <div class="row">
       <button id="pCancel">閉じる</button>
       <button id="pPng">画像（PNG）で保存</button>
@@ -599,7 +642,7 @@ let D=null;
 let view={s:0.1,ox:40,oy:40};
 const ui={autoFit:true,placing:null,ghost:null,placeRot:false,mono:false,arrow:'both',mode:'base',tool:'draw',sel:null,editBase:false,cmp:'side',toggleAfter:false,showDim:false,showArea:false,autoPlace:true,tpl:null,noteTool:null,dimA:null,diag:false,step:455,tatami:1.62,dragging:false};
 
-function newData(){return{title:'',nextId:1,base:{nodes:[],walls:[]},reform:{nodes:[],walls:[]},furn:[],rooms:[],flows:[],notes:[],reformDone:false};}
+function newData(){return{title:'',nextId:1,base:{nodes:[],walls:[]},reform:{nodes:[],walls:[]},furn:[],rooms:[],flows:[],notes:[],photos:[],reformDone:false};}
 const nid=()=>D.nextId++;
 function nodeMap(L){const m=new Map();for(const n of L.nodes)m.set(n.id,n);return m;}
 function oriOf(A,B){const dx=Math.abs(A.x-B.x),dy=Math.abs(A.y-B.y);if(dy<TOL&&dx>=TOL)return'H';if(dx<TOL&&dy>=TOL)return'V';return null;}
@@ -1070,7 +1113,7 @@ function buildCtx(kind){
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(D));}catch(e){}}
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),3200);}
-function fixData(d){d.furn=d.furn||[];d.rooms=d.rooms||[];d.flows=d.flows||[];d.notes=d.notes||[];d.furn=d.furn.filter(f=>DEF[f.t]);d.rooms.forEach(a=>{if(a.role==='玄関')a.role='玄関（土間のみ）';});d.nextId=d.nextId||1;return d;}
+function fixData(d){d.furn=d.furn||[];d.rooms=d.rooms||[];d.flows=d.flows||[];d.notes=d.notes||[];d.photos=d.photos||[];d.photos.sort((a,b)=>((+a.n||0)-(+b.n||0))||((a.t||0)-(b.t||0)));d.photos.forEach((q,i)=>{q.n=i+1;});d.furn=d.furn.filter(f=>DEF[f.t]);d.rooms.forEach(a=>{if(a.role==='玄関')a.role='玄関（土間のみ）';});d.nextId=d.nextId||1;return d;}
 
 // ---- 座標 ----
 const s2w=p=>({x:(p.x-view.ox)/view.s,y:(p.y-view.oy)/view.s});
@@ -1341,7 +1384,7 @@ function notePts(n){
   return[{x:n.x,y:n.y}];
 }
 function noteLabel(n){
-  if(n.k==='num')return String(n.n);
+  if(n.k==='num')return n.pid?String(phNum(n.pid)):String(n.n);
   if(n.k==='dim'){const len=Math.hypot(n.b.x-n.a.x,n.b.y-n.a.y)/10;return(n.txt?n.txt+':':'')+(n.cm!=null?fmtN(n.cm)+'cm':'約'+fmtN(len)+'cm');}
   if(n.k==='text')return(n.txt||'')+(n.cm!=null?((n.txt?':':'')+fmtN(n.cm)+'cm'):'');
   return n.txt||'';
@@ -1400,9 +1443,14 @@ function drawNotes(ctx,kind,v,k,o){
     const halo=(t,x,y)=>{ctx.lineWidth=3.5*k;ctx.strokeStyle='rgba(255,255,255,.95)';ctx.strokeText(t,x,y);ctx.fillStyle=col;ctx.fillText(t,x,y);};
     if(n.k==='num'){
       const r=Math.max(11*k,140*S),x=n.x*S+v.ox,y=n.y*S+v.oy;
+      if(n.pid&&n.dir!=null){ // 撮った向き：小さな扇形（見取り図のじゃまにならない大きさ）
+        const a=(n.dir-90)*PI/180,R=r*2.3,hw=24*PI/180;
+        ctx.beginPath();ctx.moveTo(x,y);ctx.arc(x,y,R,a-hw,a+hw);ctx.closePath();
+        ctx.fillStyle=MONO?'rgba(60,70,85,.16)':(ref?'rgba(26,86,196,.16)':'rgba(15,118,110,.2)');ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=1.1*k;ctx.stroke();
+      }
       if(sel){ctx.beginPath();ctx.arc(x,y,r+5,0,PI*2);ctx.strokeStyle='rgba(245,159,0,.7)';ctx.lineWidth=4;ctx.stroke();}
       ctx.beginPath();ctx.arc(x,y,r,0,PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=2*k*th;ctx.stroke();
-      ctx.font='bold '+(r*1.15)+'px '+FONT;ctx.fillStyle=col;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(n.n),x,y+r*.05);
+      ctx.font='bold '+(r*1.15)+'px '+FONT;ctx.fillStyle=col;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(noteLabel(n),x,y+r*.05);
     }else if(n.k==='text'){
       const L=noteLabel(n).split('\n'),x=n.x*S+v.ox,y=n.y*S+v.oy;
       ctx.textAlign='center';ctx.textBaseline='middle';
@@ -1452,6 +1500,15 @@ function startNote(k){
 function placeNote(p){
   const el=editLayer();if(!el||!ui.noteTool)return;
   const k=ui.noteTool,pre=JSON.stringify(D),sw=s2w(p);
+  if(k==='photo'){
+    const pid=ui.photoPid,ph=D.photos.find(q=>q.id===pid);if(!ph){ui.noteTool=null;ui.ghost=null;updateUI();draw();return;}
+    const old=D.notes.find(q=>q.pid===pid);
+    D.notes=D.notes.filter(q=>q.pid!==pid);
+    const n={id:nid(),k:'num',layer:'base',x:Math.round(sw.x/10)*10,y:Math.round(sw.y/10)*10,pid,n:0};
+    if(old&&old.dir!=null)n.dir=old.dir;
+    D.notes.push(n);ui.noteTool=null;ui.photoPid=null;ui.dimA=null;ui.ghost=null;ui.sel=null;
+    commit(pre);setDrawer('L');phRender();toast('番号を図に置きました。写真の欄のバーを回すと、撮った向きも残せます');return;
+  }
   const w=(k==='dim')?snapPt(sw):{x:Math.round(sw.x/10)*10,y:Math.round(sw.y/10)*10};
   let n;
   if(k==='dim'){
@@ -1469,6 +1526,7 @@ function dupNote(){
   const n=curNote();if(!n||!editLayer())return;const pre=JSON.stringify(D);
   const c=JSON.parse(JSON.stringify(n));c.id=nid();c.layer=editLayer();
   const o=300;if(c.k==='dim'){c.a.x+=o;c.a.y+=o;c.b.x+=o;c.b.y+=o;}else{c.x+=o;c.y+=o;if(c.k==='call'){c.tx+=o;c.ty+=o;}}
+  if(c.k==='num'){delete c.pid;delete c.dir;}
   if(c.k==='num')c.n=Math.max(0,...D.notes.filter(q=>q.k==='num').map(q=>+q.n||0))+1;
   D.notes.push(c);ui.sel={type:'note',id:c.id};commit(pre);
 }
@@ -1940,7 +1998,11 @@ function tapSelect(h,p){
     return;
   }
   if(h.kind==='handle')return;
-  if(h.kind==='note'){ui.sel={type:'note',id:h.id};updateUI();return;}
+  if(h.kind==='note'){
+    const nn=noteById(h.id);
+    if(nn&&nn.pid&&phView(nn.pid)&&ui.tool!=='flow')return;
+    ui.sel={type:'note',id:h.id};updateUI();return;
+  }
   if(h.kind==='flow'){ui.sel={type:'flow',layer:h.layer,id:h.id};updateUI();return;}
   if(h.kind==='furn'){ui.sel={type:'furn',layer:h.layer,id:h.id};updateUI();return;}
   const L=D[h.layer],comp=component(L,h.id),s=ui.sel;
@@ -2564,7 +2626,7 @@ function clearAll(){
               :'改修（青）で足した壁・家具・動線をすべて消し、「撤去」の印も外します。\n現状図（黒）は残ります。（「元に戻す」で戻せます）\nよろしいですか？';
   if(!confirm(msg))return;
   const pre=JSON.stringify(D);
-  if(all){D.base={nodes:[],walls:[]};D.reform={nodes:[],walls:[]};D.furn=[];D.flows=[];D.notes=[];D.rooms=[];D.reformDone=false;}
+  if(all){D.base={nodes:[],walls:[]};D.reform={nodes:[],walls:[]};D.furn=[];D.flows=[];D.notes=[];D.photos=[];D.rooms=[];D.reformDone=false;}
   else{
     D.reform={nodes:[],walls:[]};
     D.furn=D.furn.filter(f=>f.layer!=='reform');D.furn.forEach(f=>{delete f.rm;});
@@ -2774,7 +2836,7 @@ function fillProps(){
       const ok=noteEditable(n),K=n.k;
       const nm={text:'文字',num:'番号丸',dim:'寸法線',call:'吹き出し'}[K]+(n.layer==='reform'?'（改修で追加）':'');
       $('#nName').textContent='選んだもの：'+nm;
-      $('#nTxtRow').hidden=K==='num';$('#nCmRow').hidden=!(K==='dim'||K==='text');$('#nNumRow').hidden=K!=='num';
+      $('#nTxtRow').hidden=K==='num';$('#nCmRow').hidden=!(K==='dim'||K==='text');$('#nNumRow').hidden=K!=='num'||!!n.pid;
       $('#nPickRow').hidden=K!=='text';$('#nCmR').hidden=K!=='text';
       if(K==='text'){$('#nCm').min=1;$('#nCm').max=200;}else{$('#nCm').removeAttribute('min');$('#nCm').removeAttribute('max');}
       $('#nSzRow').hidden=K==='num';$('#nDimRow').hidden=K!=='dim';
@@ -2846,12 +2908,13 @@ function updateUI(){
 $('#bDiag').textContent=ui.diag?'／ 斜めの壁：ON':'／ 斜めの壁：OFF';$('#bDiag').classList.toggle('on',!!ui.diag);
   $('#gRail').hidden=!(edit&&ui.tool==='select'&&el);
   $('#gNote').hidden=!(edit&&ui.tool==='flow'&&el);
+  $('#gPhotos').hidden=!(edit&&ui.tool==='flow');phSync();
   $('#gPlace').hidden=!(((ui.placing&&ui.tool==='select')||(ui.noteTool&&ui.tool==='flow')||(ui.tpl&&ui.tool==='draw'))&&edit);
   $('#bTplPut').hidden=!(ui.tpl&&ui.tool==='draw');
   $('#bPlaceRot').hidden=!!ui.noteTool;$('#bPlaceAuto').hidden=!!ui.noteTool||!!ui.tpl;
   if(ui.tpl){const tt=TPL.find(x=>x.id===ui.tpl.id);$('#placeName').textContent='「'+tt.n+'」を置く場所を決めてください（壁の角や線に近づけると、くっつきます）';$('#bPlaceRot').textContent='90°回す';}else $('#bPlaceRot').textContent='縦横を切り替え';
   if(ui.placing&&DEF[ui.placing])$('#placeName').textContent='「'+DEF[ui.placing].n+'」を置く場所をタップ／クリック（1回置くと終わります）';
-  if(ui.noteTool){const NN={text:'文字',val:'数値メモ',num:'番号',dim:'寸法線',call:'吹き出し'};$('#placeName').textContent=ui.noteTool==='dim'?(ui.dimA?'「寸法線」：終点をタップ／クリック':'「寸法線」：始点をタップ／クリック（壁や家具の角に吸い付きます）'):'「'+NN[ui.noteTool]+'」を置く場所をタップ／クリック（1回置くと終わります）';}
+  if(ui.noteTool){const NN={text:'文字',val:'数値メモ',num:'番号',photo:'写真の場所',dim:'寸法線',call:'吹き出し'};$('#placeName').textContent=ui.noteTool==='dim'?(ui.dimA?'「寸法線」：終点をタップ／クリック':'「寸法線」：始点をタップ／クリック（壁や家具の角に吸い付きます）'):'「'+NN[ui.noteTool]+'」を置く場所をタップ／クリック（1回置くと終わります）';}
   cv.style.cursor=(ui.placing||ui.noteTool||ui.tpl)?'crosshair':'';
   $('#gFlow').hidden=!(edit&&ui.tool==='flow');
   {const f=(s&&s.type==='flow')?D.flows.find(x=>x.id===s.id):null,ok=!!f&&f.layer===el,inRef=ui.mode==='reform'&&!ui.editBase;
@@ -2945,7 +3008,7 @@ cv.addEventListener('pointerdown',e=>{
   if(fh)g={type:'sel',start:p,hit:fh,moved:false};
   else if(ui.tool==='draw'||ui.tool==='flow')g={type:ui.tool==='flow'?'flowdraw':'draw',pts:[s2w(p)],last:p};
   else{
-    const hit=hitHandle(p)||hitFlow(p)||hitFurn(p,false)||hitWall(p.x,p.y)||hitFurn(p,true);
+    const hit=hitHandle(p)||phMarkerHit(p)||hitFlow(p)||hitFurn(p,false)||hitWall(p.x,p.y)||hitFurn(p,true);
     g={type:'sel',start:p,hit,moved:false,multi:inMultiBox(p)};
   }
   draw();
@@ -3043,12 +3106,15 @@ function sheetCanvas(opt,mono){
   }
   return c;
 }
-function doPrint(opt){
-  const c=sheetCanvas(opt,$('#pMono').checked);
+async function doPrint(opt){
+  const mono=$('#pMono').checked,c=sheetCanvas(opt,mono);
   $('#printArea').innerHTML='';const img=new Image();img.src=c.toDataURL('image/png');$('#printArea').appendChild(img);
+  if(D.photos.length&&$('#pPh').checked){
+    try{for(const pc of await phSheets(mono)){const im2=new Image();im2.src=pc.toDataURL('image/jpeg',.9);$('#printArea').appendChild(im2);}}catch(e){toast('写真ページを作れませんでした');}
+  }
   $('#pageStyle').textContent='@page{size:A4 landscape;margin:8mm}';
   $('#printDlg').hidden=true;
-  setTimeout(()=>window.print(),150);
+  setTimeout(()=>window.print(),400);
 }
 function savePng(opt){
   const c=sheetCanvas(opt,$('#pMono').checked);
@@ -3057,22 +3123,28 @@ function savePng(opt){
 }
 
 // ---- ファイル ----
-function exportJson(){
-  const b=new Blob([JSON.stringify(D)],{type:'application/json'});
+function phBlobToDataUrl(b){return new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>res(null);fr.readAsDataURL(b);});}
+async function exportJson(){
+  const o=JSON.parse(JSON.stringify(D));
+  for(const q of o.photos||[]){const bl=PH.blobs.get(q.id);if(bl){const u=await phBlobToDataUrl(bl);if(u)q.img=u;}}
+  const b=new Blob([JSON.stringify(o)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(b);
   const d=new Date(),ds=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
   a.download=`madori_${(D.title||'plan').replace(/[\\/:*?"<>|\s]/g,'_')}_${ds}.json`;
   document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-  toast('保存用ファイルを書き出しました');
+  toast('保存用ファイルを書き出しました'+(D.photos.length?'（小さくした写真も入っています）':''));
 }
 function importJson(file){
   const r=new FileReader();
-  r.onload=()=>{
+  r.onload=async()=>{
     try{
       const d=JSON.parse(r.result);
       if(!d||!d.base||!d.reform||!Array.isArray(d.base.walls))throw new Error('形式が違います');
+      for(const q of d.photos||[]){ // 保存ファイルに入っていた写真を、この端末に取り込む
+        if(q.img){try{const bl=await(await fetch(q.img)).blob();PH.blobs.set(q.id,bl);await phTx('readwrite',st=>st.put({id:q.id,blob:bl}));}catch(e){}delete q.img;}
+      }
       D=fixData(d);undoStack.length=0;redoStack.length=0;ui.sel=null;ui.mode='base';$('#title').value=D.title||'';
-      ui.autoFit=true;recomputeRooms();save();fit();updateUI();draw();toast('読み込みました');
+      ui.autoFit=true;recomputeRooms();save();phGc();phRender();fit();updateUI();draw();toast('読み込みました');
     }catch(err){toast('読み込めませんでした：'+err.message);}
   };
   r.readAsText(file);
@@ -3109,6 +3181,188 @@ function importJson(file){
   ROLES.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;sel.appendChild(o);});
 })();
 
+// ===== 現地の写真（端末の中にだけ保存。番号で見取り図とむすびつける）=====
+const PH={max:20,db:null,blobs:new Map(),urls:new Map(),key:''};
+function phNum(pid){const p=D.photos.find(q=>q.id===pid);return p?p.n:'?';}
+function phMarkerHit(p){const h=hitNote(p);if(!h)return null;const n=noteById(h.id);return n&&n.pid?h:null;}
+function phUrl(id){if(PH.urls.has(id))return PH.urls.get(id);const b=PH.blobs.get(id);if(!b)return null;const u=URL.createObjectURL(b);PH.urls.set(id,u);return u;}
+function phOpenDb(){return new Promise(res=>{try{const q=indexedDB.open('madori-photos',1);q.onupgradeneeded=()=>q.result.createObjectStore('p',{keyPath:'id'});q.onsuccess=()=>res(q.result);q.onerror=()=>res(null);q.onblocked=()=>res(null);}catch(e){res(null);}});}
+function phTx(mode,fn){return new Promise(res=>{if(!PH.db){res(null);return;}try{const tx=PH.db.transaction('p',mode),st=tx.objectStore('p');const rq=fn(st);tx.oncomplete=()=>res(rq?rq.result:true);tx.onerror=()=>res(null);tx.onabort=()=>res(null);}catch(e){res(null);}});}
+async function phInit(){
+  PH.db=await phOpenDb();
+  const all=await phTx('readonly',st=>st.getAll());
+  if(all)for(const r of all)PH.blobs.set(r.id,r.blob);
+  phGc();phRender();
+}
+function phGc(){ // どの写真にも使われていない保存データを消す
+  const ids=new Set(D.photos.map(p=>p.id));
+  for(const id of[...PH.blobs.keys()]){if(!ids.has(id)){PH.blobs.delete(id);const u=PH.urls.get(id);if(u){URL.revokeObjectURL(u);PH.urls.delete(id);}phTx('readwrite',st=>st.delete(id));}}
+}
+async function phResize(file){
+  let bmp;
+  try{bmp=await createImageBitmap(file,{imageOrientation:'from-image'});}
+  catch(e){bmp=await new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=URL.createObjectURL(file);});}
+  const W=bmp.width||bmp.naturalWidth,H=bmp.height||bmp.naturalHeight,sc=Math.min(1,1300/Math.max(W,H));
+  const c=document.createElement('canvas');c.width=Math.max(1,Math.round(W*sc));c.height=Math.max(1,Math.round(H*sc));
+  c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+  if(bmp.close)bmp.close();
+  return new Promise(res=>c.toBlob(res,'image/jpeg',.72));
+}
+async function phAddFiles(files){
+  if(!files||!files.length)return;
+  let added=0;
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+  for(const f of files){
+    if(D.photos.length>=PH.max){toast('写真は'+PH.max+'枚までです');break;}
+    try{
+      const blob=await phResize(f);if(!blob)throw new Error('変換できません');
+      const id='ph'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+      PH.blobs.set(id,blob);
+      const okSave=await phTx('readwrite',st=>st.put({id,blob}));
+      if(!okSave&&!PH.warned){PH.warned=true;toast('この端末では写真を保存できない設定です。画面を閉じると消えます');}
+      const pre=JSON.stringify(D);
+      D.photos.push({id,n:D.photos.length+1,memo:'',t:Date.now()});
+      commit(pre);added++;
+    }catch(e){toast('写真を読み込めませんでした');}
+  }
+  if(added){phRender();const L=$('#phList');if(L)L.scrollTop=L.scrollHeight;}
+}
+function phSig(){return JSON.stringify(D.photos.map(p=>[p.id,p.n,p.memo,D.notes.filter(n=>n.pid===p.id).map(n=>[n.dir])]))+'|'+(ui.sel&&ui.sel.type==='note'?ui.sel.id:'')+'|'+PH.blobs.size;}
+function phSync(){
+  const L=$('#phList');if(!L)return;
+  $('#phCount').textContent=D.photos.length+'/'+PH.max+'枚';
+  const full=D.photos.length>=PH.max;$('#bPhCam').disabled=full;$('#bPhLib').disabled=full;
+  const sg=phSig();if(sg===PH.key)return;
+  if(L.contains(document.activeElement)&&PH.key)return; // 入力中は作り直さない
+  phRender();
+}
+function phRender(){
+  const L=$('#phList');if(!L)return;PH.key=phSig();
+  const selPid=(ui.sel&&ui.sel.type==='note')?(noteById(ui.sel.id)||{}).pid:null,top=L.scrollTop;
+  L.innerHTML='';
+  if(!D.photos.length){const e=document.createElement('div');e.className='phNote';e.textContent='まだ写真がありません。';L.appendChild(e);return;}
+  D.photos.forEach((p,idx)=>{
+    const mk=D.notes.find(n=>n.pid===p.id),u=phUrl(p.id);
+    const c=document.createElement('div');c.className='phCard'+(selPid===p.id?' on':'');c.dataset.id=p.id;
+    c.innerHTML='<div class="r1"><span class="hd" title="ドラッグで順番を入れ替え">≡</span><div class="th" title="大きく見る">'+(u?'<img alt="">':'写真なし')+'</div>'
+      +'<b class="no">'+p.n+'</b><span class="mv"><button class="phUp" title="1つ前へ">▲</button><button class="phDn" title="1つ後ろへ">▼</button></span></div>'
+      +'<div class="r2"><button class="phPut"></button><button class="phRep">差し替え</button><button class="phDel">削除</button></div>'
+      +'<div class="dr"><span class="dl"></span><input type="range" class="phR" min="0" max="360" step="1"></div>';
+    if(u)c.querySelector('img').src=u;
+    c.querySelector('.th').onclick=()=>phView(p.id);
+    const dR=c.querySelector('.phR'),put=c.querySelector('.phPut'),dl=c.querySelector('.dl'),dv=c.querySelector('.dr');
+    put.textContent=mk?'置き直す':'図に置く';
+    put.onclick=()=>{if(!editLayer()){toast('比較表示中は置けません。「編集に戻る」を押してください');return;}ui.autoFit=false;ui.placing=null;ui.tpl=null;ui.noteTool='photo';ui.photoPid=p.id;ui.dimA=null;ui.sel=null;ui.ghost=null;updateUI();draw();if(window.matchMedia('(max-width:1200px)').matches)setDrawer(null);};
+    c.querySelector('.phRep').onclick=()=>{PH.repId=p.id;$('#fPhRep').click();};
+    // 撮った向き：0＝向きなし、1〜360＝図の上を0°として右まわり（360は上向き）
+    const cur=mk&&mk.dir!=null?mk.dir:null,sv=cur===null?0:(cur===0?360:cur);
+    dv.hidden=!mk;dR.value=sv;
+    const lab=v=>{dl.textContent=v===0?'撮った向き：回すと扇形が出ます':'撮った向き：'+(v===360?0:v)+'°（上が0°・右まわり）';};lab(sv);
+    let pre=null;
+    const done=()=>{if(pre!==null){const q=pre;pre=null;commit(q);PH.key=phSig();}};
+    dR.oninput=()=>{const m=D.notes.find(n=>n.pid===p.id);if(!m)return;if(pre===null)pre=JSON.stringify(D);const v=parseInt(dR.value,10);if(v===0)delete m.dir;else m.dir=v%360;lab(v);save();draw();};
+    dR.onchange=done;
+    const mv=d=>phMove(idx,idx+d);
+    const bu=c.querySelector('.phUp'),bd=c.querySelector('.phDn');bu.disabled=idx===0;bd.disabled=idx===D.photos.length-1;bu.onclick=()=>mv(-1);bd.onclick=()=>mv(1);
+    c.querySelector('.hd').onpointerdown=e=>phDrag(e,c,idx);
+    c.querySelector('.phDel').onclick=()=>{
+      if(!confirm('この写真（番号'+p.n+'）を削除します。図の番号の丸も消え、後ろの番号は1つずつ繰り上がります。よろしいですか？'))return;
+      const q=JSON.stringify(D);D.photos=D.photos.filter(x=>x.id!==p.id);D.photos.forEach((x,k)=>{x.n=k+1;});D.notes=D.notes.filter(n=>n.pid!==p.id);ui.sel=null;commit(q);phRender();
+    };
+    L.appendChild(c);
+  });
+  L.scrollTop=top;
+}
+function phMove(from,to){
+  if(from===to||to<0||to>=D.photos.length)return;
+  const q=JSON.stringify(D),[it]=D.photos.splice(from,1);D.photos.splice(to,0,it);D.photos.forEach((x,k)=>{x.n=k+1;});
+  commit(q);phRender();
+}
+// 枠をドラッグして順番を入れ替える（つまみの「≡」をつかむ）
+function phDrag(e,card,from){
+  e.preventDefault();
+  const L=$('#phList'),cards=[...L.querySelectorAll('.phCard')],y0=e.clientY,hd=e.currentTarget;
+  try{hd.setPointerCapture(e.pointerId);}catch(_){}
+  const mids=()=>cards.map(c=>{const r=c.getBoundingClientRect();return r.top+r.height/2;});
+  let to=from,lastY=y0,raf=0;const sc0=L.scrollTop;
+  card.classList.add('drag');
+  const ind=document.createElement('div');ind.className='phDrop';
+  const place=()=>{ // 入れる位置の目印
+    const m=mids().filter((_,i)=>i!==from);let k=0;while(k<m.length&&m[k]<lastY)k++;to=k;
+    const others=cards.filter((_,i)=>i!==from);
+    if(others[k])L.insertBefore(ind,others[k]);else L.appendChild(ind);
+  };
+  const upd=()=>{card.style.transform='translateY('+(lastY-y0+(L.scrollTop-sc0))+'px)';place();};
+  const auto=()=>{
+    const r=L.getBoundingClientRect();let d=0;
+    if(lastY<r.top+36)d=-9;else if(lastY>r.bottom-36)d=9;
+    if(d){L.scrollTop+=d;upd();}
+    raf=requestAnimationFrame(auto);
+  };
+  upd();raf=requestAnimationFrame(auto);
+  const mvE=ev=>{lastY=ev.clientY;upd();};
+  const end=ev=>{
+    cancelAnimationFrame(raf);hd.removeEventListener('pointermove',mvE);hd.removeEventListener('pointerup',end);hd.removeEventListener('pointercancel',end);
+    ind.remove();card.classList.remove('drag');card.style.transform='';
+    if(ev.type==='pointercancel'){phRender();return;}
+    if(to!==from)phMove(from,to);else phRender();
+  };
+  hd.addEventListener('pointermove',mvE);hd.addEventListener('pointerup',end);hd.addEventListener('pointercancel',end);
+}
+let phViewId=null;
+function phView(pid){
+  const p=D.photos.find(q=>q.id===pid);if(!p)return false;
+  const u=phUrl(pid);if(!u){toast('この端末には、この写真がありません');return false;}
+  phViewId=pid;$('#phViewImg').src=u;
+  $('#phViewCap').textContent='写真 '+p.n;
+  $('#phView').hidden=false;return true;
+}
+function phStep(d){const i=D.photos.findIndex(q=>q.id===phViewId);if(i<0)return;for(let k=1;k<=D.photos.length;k++){const q=D.photos[(i+d*k+D.photos.length*k)%D.photos.length];if(q&&phUrl(q.id)){phView(q.id);return;}}}
+$('#phClose').onclick=()=>{$('#phView').hidden=true;};
+$('#phPrev').onclick=()=>phStep(-1);$('#phNext').onclick=()=>phStep(1);
+$('#phView').addEventListener('click',e=>{if(e.target.id==='phView')$('#phView').hidden=true;});
+document.addEventListener('keydown',e=>{if(!$('#phView').hidden){if(e.key==='Escape')$('#phView').hidden=true;else if(e.key==='ArrowLeft')phStep(-1);else if(e.key==='ArrowRight')phStep(1);}});
+$('#bPhCam').onclick=()=>$('#fPhCam').click();$('#bPhLib').onclick=()=>$('#fPhLib').click();
+$('#fPhCam').onchange=e=>{const f=[...e.target.files];e.target.value='';phAddFiles(f);};
+$('#fPhLib').onchange=e=>{const f=[...e.target.files];e.target.value='';phAddFiles(f);};
+$('#fPhRep').onchange=async e=>{ // 写真の差し替え：番号・図の位置・向きはそのまま、中の写真だけ入れ替える
+  const f=e.target.files[0];e.target.value='';const id=PH.repId;PH.repId=null;
+  if(!f||!id||!D.photos.some(q=>q.id===id))return;
+  try{
+    const blob=await phResize(f);if(!blob)throw new Error('x');
+    PH.blobs.set(id,blob);const u=PH.urls.get(id);if(u){URL.revokeObjectURL(u);PH.urls.delete(id);}
+    await phTx('readwrite',st=>st.put({id,blob}));
+    PH.key='';phRender();toast('写真を差し替えました');
+  }catch(err){toast('写真を読み込めませんでした');}
+};
+// 印刷用：番号つきの写真一覧（A4よこ・1ページ6枚）
+async function phSheets(mono){
+  const list=D.photos.slice().sort((a,b)=>(a.n-b.n)||(a.t-b.t)),per=6,W=2200,H=1556,pages=Math.ceil(list.length/per),out=[];
+  const imgs=await Promise.all(list.map(async p=>{const b=PH.blobs.get(p.id);if(!b)return null;try{return await createImageBitmap(b);}catch(e){return null;}}));
+  for(let pg=0;pg<pages;pg++){
+    const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+    x.fillStyle='#fff';x.fillRect(0,0,W,H);
+    x.fillStyle='#1f2933';x.font=`bold 46px ${FONT}`;x.textBaseline='alphabetic';x.textAlign='left';x.fillText((D.title||'間取り図')+'　現地の写真',60,84);
+    x.font=`28px ${FONT}`;x.fillStyle='#667085';x.textAlign='right';x.fillText((pages>1?(pg+1)+' / '+pages+'　':'')+new Date().toLocaleDateString('ja-JP'),W-60,84);
+    const gx=30,gy=70,cw=(W-120-gx*2)/3,ih=Math.round(cw*.75),Y0=116+Math.max(0,((H-166)-(2*ih+gy))/2);
+    for(let i=0;i<per;i++){
+      const idx=pg*per+i;if(idx>=list.length)break;
+      const p=list[idx],bm=imgs[idx],col=idx%3,row=Math.floor(i/3),X=60+col*(cw+gx),Y=Y0+row*(ih+gy);
+      x.fillStyle='#eef1f5';x.fillRect(X,Y,cw,ih);
+      if(bm){const s=Math.min(cw/bm.width,ih/bm.height),w=bm.width*s,h=bm.height*s;x.drawImage(bm,X+(cw-w)/2,Y+(ih-h)/2,w,h);}
+      else{x.fillStyle='#98a2b3';x.font=`26px ${FONT}`;x.textAlign='center';x.textBaseline='middle';x.fillText('写真なし（この端末に保存されていません）',X+cw/2,Y+ih/2);}
+      x.strokeStyle='#c8ced8';x.lineWidth=2;x.strokeRect(X,Y,cw,ih);
+      const r=36,cx=X+r+10,cy=Y+r+10;
+      x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.fillStyle='#fff';x.fill();x.strokeStyle='#475467';x.lineWidth=4;x.stroke();
+      x.fillStyle='#475467';x.font=`bold 42px ${FONT}`;x.textAlign='center';x.textBaseline='middle';x.fillText(String(p.n),cx,cy+2);
+    }
+    if(mono){const im=x.getImageData(0,0,W,H),d=im.data;for(let i=0;i<d.length;i+=4){const y=Math.round(d[i]*.299+d[i+1]*.587+d[i+2]*.114);d[i]=d[i+1]=d[i+2]=y;}x.putImageData(im,0,0);}
+    out.push(c);
+  }
+  imgs.forEach(b=>{if(b&&b.close)b.close();});
+  return out;
+}
+
 // ---- ボタン ----
 $$('#tabs button').forEach(b=>b.onclick=()=>{setMode(b.dataset.mode);$('#tabs').hidden=true;});
 $('#bMode').onclick=e=>{e.stopPropagation();$('#tabs').hidden=!$('#tabs').hidden;};
@@ -3119,7 +3373,7 @@ $$('#cmps button').forEach(b=>b.onclick=()=>{ui.cmp=b.dataset.cmp;fit();updateUI
 $('#bUndo').onclick=undo;$('#bRedo').onclick=redo;
 $('#bAddRail').onclick=()=>startPlace('rail');
 $('#bAddPRail').onclick=()=>startPlace('prail');
-$('#bNoteText').onclick=()=>startNote('text');$('#bNoteNum').onclick=()=>startNote('num');$('#bNoteDim').onclick=()=>startNote('dim');$('#bNoteVal').onclick=()=>startNote('val');$('#bNoteCall').onclick=()=>startNote('call');
+$('#bNoteText').onclick=()=>startNote('text');$('#bNoteDim').onclick=()=>startNote('dim');$('#bNoteVal').onclick=()=>startNote('val');$('#bNoteCall').onclick=()=>startNote('call');
 {let nPre=null;
  const live=(fn)=>e=>{const n=curNote();if(!noteEditable(n))return;if(nPre===null)nPre=JSON.stringify(D);fn(n,e.target.value);save();draw();};
  const done=()=>{if(nPre!==null){const pr=nPre;nPre=null;commit(pr);}};
@@ -3213,11 +3467,12 @@ $('#title').oninput=e=>{D.title=e.target.value;save();};
 $('#bSave').onclick=exportJson;
 $('#bLoad').onclick=()=>$('#fileIn').click();
 $('#fileIn').onchange=e=>{if(e.target.files[0])importJson(e.target.files[0]);e.target.value='';};
-$('#bNew').onclick=()=>{if(!confirm('いまの図面を消して新しく始めます。よろしいですか？\n（先に「保存」で書き出しておくと安心です）'))return;D=newData();undoStack.length=0;redoStack.length=0;ui.sel=null;ui.mode='base';$('#title').value='';ui.autoFit=true;recomputeRooms();save();fit();updateUI();draw();};
-$('#bPrint').onclick=()=>{$('#printDlg').hidden=false;$('#pMono').checked=!!ui.mono;const r=document.querySelector('input[name=pl][value='+(D.reformDone?'side':'before')+']');if(r)r.checked=true;};
+$('#bNew').onclick=()=>{if(!confirm('いまの図面を消して新しく始めます。よろしいですか？\n（先に「保存」で書き出しておくと安心です）'))return;D=newData();undoStack.length=0;redoStack.length=0;ui.sel=null;ui.mode='base';$('#title').value='';ui.autoFit=true;recomputeRooms();save();phGc();phRender();fit();updateUI();draw();};
+$('#bPrint').onclick=()=>{$('#printDlg').hidden=false;$('#pPhRow').hidden=!D.photos.length;$('#pPhTxt').textContent='番号つきの写真ページも印刷する（'+D.photos.length+'枚）';$('#pMono').checked=!!ui.mono;const r=document.querySelector('input[name=pl][value='+(D.reformDone?'side':'before')+']');if(r)r.checked=true;};
 $('#pCancel').onclick=()=>{$('#printDlg').hidden=true;};
 $('#pGo').onclick=()=>doPrint(document.querySelector('input[name=pl]:checked').value);
 $('#pPng').onclick=()=>savePng(document.querySelector('input[name=pl]:checked').value);
+phInit();
 window.addEventListener('afterprint',()=>{$('#printArea').innerHTML='';});
 window.addEventListener('resize',()=>{if(ui.autoFit)fit();draw();});
 if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>{if(ui.autoFit)fit();draw();}).observe(stage);
@@ -3239,7 +3494,7 @@ window.addEventListener('keydown',e=>{
     {tool:'select',no:'② 内容を編集',title:'次に、家具や手すり・扉を置きます',
      text:'左の「屋内」パネルから置きたいものを選び、図面をタップすると置けます。置いたものは、ドラッグで動かせます。何もない所をなぞると範囲選択ができ、まとめて動かしたり消したりできます。'},
     {tool:'flow',no:'③ 詳細の追加',title:'最後に、補足を書き込みます',
-     text:'人の動き（動線）を、指やマウスでなぞって描けます。文字・番号・寸法線・数値メモ・吹き出しは、左端のパネルのボタンから追加します。'}
+     text:'人の動き（動線）を、指やマウスでなぞって描けます。文字・寸法線・数値メモ・吹き出しは、左端のパネルのボタンから追加します。現地の写真は、標準のカメラで撮っておき、「写真から選ぶ」で取り込みます。取り込むのは小さくしたコピーで、番号をつけて見取り図の上に置け、撮った向きも残せます。写真は端末の中だけに保存されます。'}
   ];
   let i=0,hadFold=false;
   const T=$('#tut');
